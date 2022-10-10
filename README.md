@@ -8,10 +8,10 @@ Gérald Oster <<gerald.oster@telecomnancy.eu>>
 ## Titre du projet
 
 **Membres du groupe** :
-- À compléter
-- À compléter
-- À compléter
-- À compléter
+- Manon Lécubin 
+- Aurélie Demure
+- Pierre Auguste
+- Nicolas Fernandez
 
 ## Description du projet
 
