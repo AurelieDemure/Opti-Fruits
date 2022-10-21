@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{CR reunion 20/10/2022}
+\author{Aurélie DEMURE}
+\date{21 October 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Finalisation du premier livrable}
+
+\begin{itemize}
+    \item Derniers ajustements et vérifications
+    \item Choix des éléments à mettre dans la présentation
+    \item Réflexion sur l'identité de l'application
+\end{itemize}
+
+\section{Présentation orale}
+\begin{itemize}
+    \item Travail collectif et individuel sur différentes slides puis mise en commun pour obtenir le support de la présentation
+    \item Répartition des rôles pour la soutenance
+\end{itemize}
+
+\section{ToDo List}
+\begin{itemize}
+    \item Entraînement pour la soutenance
+    \item Réflexion sur d'éventuelles questions envisageables
+\end{itemize}
+
+
+\end{document}
