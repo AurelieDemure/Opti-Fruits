@@ -1,0 +1,8 @@
+.bg{
+    background-color: #c7eae4ff;
+}
+
+.maindiv{
+    display:flex;
+    flex-wrap: wrap;
+}
