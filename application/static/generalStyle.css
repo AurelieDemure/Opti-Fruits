@@ -6,3 +6,13 @@
     display:flex;
     flex-wrap: wrap;
 }
+
+.frame{
+    position: relative;
+}
+
+.pointeur   {
+    position: absolute;
+    top:663px;
+    
+}

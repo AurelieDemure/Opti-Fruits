@@ -9,3 +9,8 @@ def homeDev():
 @app.route('/testLayout')
 def testLayout():
     return render_template("testLayout.html")
+
+@app.route('/map')
+def map():
+    return render_template("map.html")
+
