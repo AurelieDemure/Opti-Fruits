@@ -1,0 +1,28 @@
+.page {
+    display: block;
+    flex-direction: column;
+    column-count: 3;
+}
+
+.Identité {
+    display: block;
+    flex-direction: row;
+    }
+
+.Contact {
+    display: block;
+    flex-direction: row;
+}
+
+.Autres {
+    display: block;
+    flex-direction: row;
+}
+
+.Text {
+    color: black;
+    size-adjust: 5%;
+    text-align: center;
+}
+
+
