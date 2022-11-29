@@ -1,18 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+{%extends "connectedLayout.html"%}
+
+{%block body%}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href={{url_for('static', filename="connexion.css")}}>
     <div class="page">
         <div class="Text">Email</div>
-        <input name="Email" placeholder="ex : xyz@optifruit.fr">
+        <input id="Email" name="Email" placeholder="ex : xyz@optifruit.fr">
         <div class="Text">Mot de passe</div>
-        <input name="Mot de passe" placeholder="ex : TinderTartePommes2022">
-        <input type="submit" value="Valider">
+        <input id="mdp" name="Mot de passe" placeholder="ex : TinderTartePommes2022">
+        <input id="submit" type="submit" value="Valider">
     </div>
-</body>
-</html>
+{%endblock%}

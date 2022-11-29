@@ -1,0 +1,34 @@
+.page{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.Text{
+    color: black;
+    size-adjust: 5%;
+    text-align: center;
+}
+
+.Email{
+    color:  #efa7a7ff;
+    border: 5%;
+    border-color: black;
+    border-radius: 15%;
+    text-align: center;
+}
+
+.mdp{
+    color: #efa7a7ff;
+    border: 5%;
+    border-color: black;
+    border-radius: 15%;
+    text-align: center;
+}
+
+.submit{
+    color: #efa7a7ff;
+    border: 5%;
+    border-color: black;
+    border-radius: 15%;
+}
+

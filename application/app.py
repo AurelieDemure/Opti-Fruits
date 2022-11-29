@@ -9,3 +9,11 @@ def homeDev():
 @app.route('/testLayout')
 def testLayout():
     return render_template("testLayout.html")
+
+@app.route('/inscription')
+def inscription():
+    return render_template("inscription.html")
+
+@app.route('/connexion')
+def connexion():
+    return render_template("connexion.html")

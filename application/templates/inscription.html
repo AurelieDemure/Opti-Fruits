@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+
+{%extends "connectedLayout.html"%}
+
+{%block body%}
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href={{url_for('static', filename="inscription.css")}}> 
     <div class="page">
         <div class="Rubriques">
             <div class="Identité">
@@ -34,5 +31,4 @@
         </div>
         <input type="submit" value="Valider">
     </div>
-</body>
-</html>
+{%endblock%}
