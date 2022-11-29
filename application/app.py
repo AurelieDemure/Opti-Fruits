@@ -1,7 +1,7 @@
 from cs50 import SQL
 from flask import Flask, render_template,g
 
-db= SQL('sqlite:///Documents_Appli/bd.db')
+db= SQL('sqlite:///static/bd.db')
 
 app=Flask(__name__)
 
@@ -15,7 +15,7 @@ def homeDev():
 def testLayout():
     return render_template("testLayout.html")
 
-<<<<<<< HEAD
+
 @app.route('/inscription')
 def inscription():
     return render_template("inscription.html")
@@ -23,7 +23,7 @@ def inscription():
 @app.route('/connexion')
 def connexion():
     return render_template("connexion.html")
-=======
+
 @app.route('/map')
 def map():
     return render_template("map.html")
@@ -36,4 +36,4 @@ def assos():
 @app.route('/TODO')
 def todo():
     return render_template("TODO.html")
->>>>>>> be3152ddcfd56e642239723760016bc88d2261ad
+
