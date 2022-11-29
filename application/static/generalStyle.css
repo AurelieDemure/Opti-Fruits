@@ -1,22 +1,31 @@
-.bg{
-    background-color: var(--cyan);
-}
-
-.centerDiv{
-    display:flex;
-    flex-wrap: wrap;
-}
-
-.mainDiv{
-    background-color: var(--light-pink);
-    margin: 0%;
-    padding-bottom: 0%;
-}
-
 .UserName{
     color: var(--dark-green);
 }
 
-.picture{
-    width: 10%;
+.user{
+    
+}
+
+.logo{
+    width:200px;
+}
+
+.icon{
+    width: 50px;
+    fill: var(--dark-green);
+}
+
+body {
+    margin: 0;
+    background-color: var(--cyan);
+}
+
+nav{ 
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    background-color: var(--light-pink);
+    height: 5%;
 }
