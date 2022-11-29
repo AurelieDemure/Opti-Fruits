@@ -1,7 +1,7 @@
 from cs50 import SQL
 from flask import Flask, render_template,g
 
-db= SQL('sqlite:///Documents_Appli/bd.db')
+db= SQL('sqlite:///static/bd.db')
 
 app=Flask(__name__)
 
