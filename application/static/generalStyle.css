@@ -1,8 +1,22 @@
 .bg{
-    background-color: #c7eae4ff;
+    background-color: var(--cyan);
 }
 
-.maindiv{
+.centerDiv{
     display:flex;
     flex-wrap: wrap;
+}
+
+.mainDiv{
+    background-color: var(--light-pink);
+    margin: 0%;
+    padding-bottom: 0%;
+}
+
+.UserName{
+    color: var(--dark-green);
+}
+
+.picture{
+    width: 10%;
 }
