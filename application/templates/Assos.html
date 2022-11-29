@@ -1,0 +1,13 @@
+{%extends "connectedLayout.html"%}
+
+{%block body%}
+    <div class="Associations">
+        {%for asso in assos%}
+            <div class="asso">
+                <h1>{{asso.nom}}</h1>
+                <h1>{{asso.cp}}</h1>
+                <h1>{{asso.ville}}</h1>
+            </div>
+        {%endfor%}
+    </div>
+{%endblock%}

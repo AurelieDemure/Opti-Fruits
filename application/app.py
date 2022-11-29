@@ -1,6 +1,11 @@
-from flask import Flask, render_template
+from cs50 import SQL
+from flask import Flask, render_template,g
+
+db= SQL('sqlite:///Documents_Appli/bd.db')
 
 app=Flask(__name__)
+
+
 
 @app.route('/')
 def homeDev():
@@ -10,6 +15,7 @@ def homeDev():
 def testLayout():
     return render_template("testLayout.html")
 
+<<<<<<< HEAD
 @app.route('/inscription')
 def inscription():
     return render_template("inscription.html")
@@ -17,3 +23,17 @@ def inscription():
 @app.route('/connexion')
 def connexion():
     return render_template("connexion.html")
+=======
+@app.route('/map')
+def map():
+    return render_template("map.html")
+
+@app.route('/associations')
+def assos():
+    assos=db.execute("SELECT * FROM association ORDER BY ville")
+    return render_template("Assos.html",assos=assos)
+
+@app.route('/TODO')
+def todo():
+    return render_template("TODO.html")
+>>>>>>> be3152ddcfd56e642239723760016bc88d2261ad
