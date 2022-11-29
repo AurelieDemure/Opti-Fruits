@@ -1,18 +1,22 @@
 .bg{
-    background-color: #c7eae4ff;
+    background-color: var(--cyan);
 }
 
-.maindiv{
+.centerDiv{
     display:flex;
     flex-wrap: wrap;
 }
 
-.frame{
-    position: relative;
+.mainDiv{
+    background-color: var(--light-pink);
+    margin: 0%;
+    padding-bottom: 0%;
 }
 
-.pointeur   {
-    position: absolute;
-    top:663px;
-    
+.UserName{
+    color: var(--dark-green);
+}
+
+.picture{
+    width: 10%;
 }

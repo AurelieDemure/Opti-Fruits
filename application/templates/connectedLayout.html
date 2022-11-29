@@ -4,10 +4,43 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href={{url_for('static', filename="colors.css")}}>
     <link rel="stylesheet" href={{url_for('static', filename="generalStyle.css")}}>
+    {%block css%}{%endblock%}
     <title>Opti'Fruit</title>
 </head>
 <body class="bg">
+    <div class="mainDiv centerDiv">
+        <div class="centerDiv">
+            <a href="/TODO">
+                <img class="picture" alt="Profile" src={{url_for('static', filename="images/Profil 1.png")}}/>
+                <h3 class="UserName">User Name</h3>
+            </a>
+        </div>
+        <div class="centerDiv">
+            <a href="/TODO">
+                <img class="picture" alt="Notifications" src={{url_for('static', filename="images/Notifications 1.png")}}/>
+            </a>
+            <a href="/TODO">
+                <img class="picture" alt="Messages" src={{url_for('static', filename="images/Messages 1.png")}}/>
+            </a>
+        </div>
+        <div class="centerDiv">
+            <a href="/testLayout">
+                <img class="picture" alt="Home" src={{url_for('static', filename="images/logo.png")}}/>
+            </a>
+        </div>
+        <div class="centerDiv">
+            <a href="/TODO">
+                <img class="picture" alt="Search" src={{url_for('static', filename="images/Rechercher.png")}}/>
+            </a>
+        </div>
+        <div class="centerDiv">
+            <a href="/TODO">
+                <img class="picture" alt="Associations" src={{url_for('static', filename="images/Association.png")}}/>
+            </a>
+        </div>
+    </div>
         {%block body%}{%endblock%}
 </body>
 </html>
