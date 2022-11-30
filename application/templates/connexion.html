@@ -1,13 +1,12 @@
-{%extends "connectedLayout.html"%}
+{% extends "connectedLayout.html" %}
+{% block body %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='connexion.css') }}">
 
-{%block body%}
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href={{url_for('static', filename="connexion.css")}}>
     <div class="page">
         <div class="Text">Email</div>
-        <input id="Email" name="Email" placeholder="ex : xyz@optifruit.fr">
+        <input id="Email" name="Email" type="text" placeholder="ex : xyz@optifruit.fr">
         <div class="Text">Mot de passe</div>
-        <input id="mdp" name="Mot de passe" placeholder="ex : TinderTartePommes2022">
+        <input class="mdp" type="password" name="Mot de passe" placeholder="ex : TinderTartePommes2022">
         <input id="submit" type="submit" value="Valider">
     </div>
-{%endblock%}
+{% endblock %}

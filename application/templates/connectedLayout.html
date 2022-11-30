@@ -6,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href={{url_for('static', filename="colors.css")}}>
     <link rel="stylesheet" href={{url_for('static', filename="generalStyle.css")}}>
-    {%block css%}{%endblock%}
     <title>Opti'Fruit</title>
 </head>
 <body class="bg">
-    <header>
         <nav>
             <!--Logo-->
             <div>
@@ -50,13 +48,9 @@
                 </a>    
             </div>
         </nav>
-    </header>
-    <main>
-        {%block body%}{%endblock%}
-    </main>
-    <footer>
 
-    </footer>
-    
+        {% block body %}
+
+        {% endblock %}
 </body>
 </html>
