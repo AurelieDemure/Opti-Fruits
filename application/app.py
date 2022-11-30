@@ -9,7 +9,7 @@ app=Flask(__name__)
 
 @app.route('/')
 def homeDev():
-    return render_template('homeDev.html')
+    return render_template('homeUnconnected.html')
 
 @app.route('/testLayout')
 def testLayout():
