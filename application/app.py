@@ -22,6 +22,7 @@ def inscription():
 @app.route('/connexion')
 def connexion():
     return render_template("connexion.html")
+    
 @app.route('/map')
 def map():
     return render_template("map.html")
