@@ -1,12 +1,15 @@
 {%extends "connectedLayout.html"%}
 
+{%block css%}
+<link rel="stylesheet" href={{url_for('static', filename="assos.css")}}>
+{%endblock%}
+
 {%block body%}
-    <div class="Associations">
+    <div class="associations">
         {%for asso in assos%}
             <div class="asso">
-                <h1>{{asso.nom}}</h1>
-                <h1>{{asso.cp}}</h1>
-                <h1>{{asso.ville}}</h1>
+                <p>{{asso.nom}}</p>
+                <p>{{asso.codepostal}} {{asso.ville}} </p>
             </div>
         {%endfor%}
     </div>

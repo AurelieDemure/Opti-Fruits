@@ -1,0 +1,12 @@
+.asso {
+    background-color: var(--dark-pink);
+}
+
+.associations {
+    display:flex;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap:wrap;
+    padding:1em;
+    padding-left:5em;
+}
