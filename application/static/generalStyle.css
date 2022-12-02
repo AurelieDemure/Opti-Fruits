@@ -2,15 +2,11 @@
     color: var(--dark-green);
 }
 
-.user{
-    
-}
-
-.logo{
+.logo {
     width:200px;
 }
 
-.icon{
+.icon {
     width: 50px;
     fill: var(--dark-green);
 }
@@ -20,7 +16,7 @@ body {
     background-color: var(--cyan);
 }
 
-nav{ 
+nav { 
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
