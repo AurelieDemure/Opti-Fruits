@@ -2,6 +2,9 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
+    min-width: 50%;
+    align-self: center;
+    margin-top: 10%;
 }
 
 .Text{
@@ -11,25 +14,26 @@
 }
 
 #Email {
-    background-color: #efa7a7ff;
     border-color: black;
-    border-radius: 15%;
     text-align: center;
+    max-width: 30%;
+    align-self: center;
 }
 
 .mdp{
-    background-color: #efa7a7ff;
     color: black;
     border-color: black;
-    border-radius: 15%;
     text-align: center;
+    max-width: 30%;
+    align-self: center;
 }
 
 
 
 #submit{
-    color: #efa7a7ff;
+    background-color: #efa7a7ff;
     border: 5%;
     border-color: black;
-    border-radius: 15%;
+    max-width: 30%;
+    align-self: center;
 }
