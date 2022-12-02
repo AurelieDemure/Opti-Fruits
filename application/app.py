@@ -1,10 +1,11 @@
 from cs50 import SQL
-from flask import Flask, render_template,g
+from flask import Flask,render_template,request
 
-db= SQL('sqlite:///static/bd.db')
+db= SQL('sqlite:///bd.db')
 
-app=Flask(__name__)
-
+app=Flask(__name__,
+    static_folder="./static",
+    template_folder="./templates")
 
 
 @app.route('/')
@@ -29,7 +30,11 @@ def map():
 
 @app.route('/associations')
 def assos():
-    assos=db.execute("SELECT * FROM association ORDER BY ville")
+    print(request)
+    if request.args.get('q') is not None:
+        assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
+    else:
+        assos=db.execute("SELECT * FROM association ORDER BY ville")
     return render_template("Assos.html",assos=assos)
 
 @app.route('/TODO')

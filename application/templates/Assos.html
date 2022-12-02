@@ -1,13 +1,18 @@
-{%extends "connectedLayout.html"%}
+{% extends "connectedLayout.html" %}
+{% block body %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assos.css')}}">
 
-{%block body%}
-    <div class="Associations">
+<form action="/associations" method="get">
+    <input autocomplete="off" autofocus name="q" placeholder="Rechercher par ville" type="search">
+    <input type="submit" value="Rechercher">
+</form>
+
+<div class="associations">
         {%for asso in assos%}
             <div class="asso">
-                <h1>{{asso.nom}}</h1>
-                <h1>{{asso.cp}}</h1>
-                <h1>{{asso.ville}}</h1>
+                <p>{{asso.nom}}</p>
+                <p>{{asso.codepostal}} {{asso.ville}} </p>
             </div>
         {%endfor%}
-    </div>
-{%endblock%}
+</div>
+{% endblock %}
