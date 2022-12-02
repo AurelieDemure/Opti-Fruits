@@ -35,3 +35,9 @@ def assos():
 @app.route('/TODO')
 def todo():
     return render_template("TODO.html")
+
+@app.route('/register')
+def register():
+    nom=request.form.get("nom")
+    if not nom:
+        return render_template("failure.html", message="Un ou plusieurs champs n'ont pas été remplis, nous ne pouvons pas vous authentifier")
