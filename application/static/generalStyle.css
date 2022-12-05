@@ -1,5 +1,6 @@
-.UserName{
+.text{
     color: var(--dark-green);
+    text-decoration: none;
 }
 
 .logo {
@@ -24,4 +25,20 @@ nav {
     justify-content: space-around;
     background-color: var(--light-pink);
     height: 5%;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.connexion{
+    background-color: var(--cyan);
+    border-radius: 20px;
+    padding: 5px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.inscription{
+    color: var(--cyan);
+    background-color: var(--dark-green);
+    border-radius: 20px;
+    padding: 5px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
 }

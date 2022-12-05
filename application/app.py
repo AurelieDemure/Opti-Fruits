@@ -8,9 +8,13 @@ app=Flask(__name__,
     template_folder="./templates")
 
 
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 def homeDev():
-    return render_template('homeUnconnected.html')
+    if request.method=='GET':
+        navbar='unconnectedLayout'
+    if request.method=='POST':
+        navbar='connectedLayout'
+    return render_template('home.html',navbar=navbar)
 
 @app.route('/testLayout')
 def testLayout():
