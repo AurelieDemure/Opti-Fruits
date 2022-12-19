@@ -1,0 +1,17 @@
+{% extends "connectedLayout.html" %}
+{% block body %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='profil.css')}}">
+
+    <h1>Recherche</h1>
+    <div class="propositions">
+        {%for proposition in propositions%}
+            <div class="proposition">
+                <img class="photo_perso" src='/static'+{{utilisateur.photo}}>
+                <p class="pseudo">{{proposition.pseudo}}</p>
+                <p class="description">{{proposition.description}}</p>
+                <img class="photo_prop" src='/static'+{{proposition.photo}}>
+            </div>
+        {%endfor%}
+    </div>
+    
+{%endblock%}
