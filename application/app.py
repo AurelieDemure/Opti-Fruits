@@ -16,10 +16,6 @@ def homeDev():
         navbar='connectedLayout'
     return render_template('home.html',navbar=navbar)
 
-@app.route('/testLayout')
-def testLayout():
-    return render_template("testLayout.html")
-
 @app.route('/inscription')
 def inscription():
     return render_template("inscription.html")
@@ -27,6 +23,10 @@ def inscription():
 @app.route('/connexion')
 def connexion():
     return render_template("connexion.html")
+
+@app.route('/propose')
+def propose():
+    return render_template("propose.html")
     
 @app.route('/map')
 def map():
