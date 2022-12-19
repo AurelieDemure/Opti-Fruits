@@ -8,13 +8,13 @@ app=Flask(__name__,
     template_folder="./templates")
 
 
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 def homeDev():
-    return render_template('homeUnconnected.html')
-
-@app.route('/testLayout')
-def testLayout():
-    return render_template("testLayout.html")
+    if request.method=='GET':
+        navbar='unconnectedLayout'
+    if request.method=='POST':
+        navbar='connectedLayout'
+    return render_template('home.html',navbar=navbar)
 
 @app.route('/inscription')
 def inscription():
@@ -23,6 +23,10 @@ def inscription():
 @app.route('/connexion')
 def connexion():
     return render_template("connexion.html")
+
+@app.route('/propose')
+def propose():
+    return render_template("propose.html")
     
 @app.route('/map')
 def map():
@@ -40,3 +44,9 @@ def assos():
 @app.route('/TODO')
 def todo():
     return render_template("TODO.html")
+
+@app.route('/register')
+def register():
+    nom=request.form.get("nom")
+    if not nom:
+        return render_template("failure.html", message="Un ou plusieurs champs n'ont pas été remplis, nous ne pouvons pas vous authentifier")
