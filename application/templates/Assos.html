@@ -2,9 +2,9 @@
 {% block body %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assos.css')}}">
 
-<form action="/associations" method="get">
+<form action="/associations" method="get" >
     <input autocomplete="off" autofocus name="q" placeholder="Rechercher par ville" type="search">
-    <input type="submit" value="Rechercher">
+    <input class="recherche" type="submit" value="Rechercher">
 </form>
 
 <div class="associations">
