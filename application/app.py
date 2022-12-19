@@ -1,5 +1,5 @@
 from cs50 import SQL
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,redirect
 
 db= SQL('sqlite:///bd.db')
 
@@ -20,7 +20,7 @@ def homeDev():
 def inscription():
     return render_template("inscription.html")
 
-@app.route('/connexion')
+@app.route('/connexion',methods=['GET','POST'])
 def connexion():
     return render_template("connexion.html")
 
@@ -45,8 +45,12 @@ def assos():
 def todo():
     return render_template("TODO.html")
 
-@app.route('/register')
-def register():
-    nom=request.form.get("nom")
-    if not nom:
-        return render_template("failure.html", message="Un ou plusieurs champs n'ont pas été remplis, nous ne pouvons pas vous authentifier")
+
+@app.route('/profil',methods=['GET','POST'])
+def profil():
+    if request.form.get('Email') is None or request.form.get('Mot de passe') is None:
+        return redirect('/connexion')    
+    else:
+        utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=? and password=?",request.form.get('Email'),request.form.get('Mot de passe'))
+        propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur[2])
+        return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
