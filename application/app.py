@@ -146,7 +146,11 @@ def inscription():
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
-    return render_template("connexion.html")
+    return render_template("connexion.html",message=' ')
+
+@app.route('/connexion/<string:message>',methods=['GET','POST'])
+def connexion2(message:str):
+    return render_template("connexion.html",message=message)
 
 @app.route('/propose')
 def propose():
@@ -182,12 +186,17 @@ def todo():
 
 @app.route('/profil',methods=['GET','POST'])
 def profil():
-    if request.form.get('Email') is None or request.form.get('Mot de passe') is None:
-        return redirect('/connexion')    
+    if request.form['Email']=='':
+        return redirect('/connexion/Veuillez renseigner votre adresse mail')    
+    elif request.form['Mot de passe']=='':
+        return redirect('/connexion/Veuillez rentrer votre mot de passe')
     else:
-        utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=? and password=?",request.form.get('Email'),request.form.get('Mot de passe'))
-        propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur[2])
-        return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
+        utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=? and password=?",request.form['Email'],request.form['Mot de passe'])
+        if utilisateur is None:
+             return redirect('/connexion/Adresse mail ou mot de passe incorrect')
+        else:
+            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur[2])
+            return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
 
 
 
