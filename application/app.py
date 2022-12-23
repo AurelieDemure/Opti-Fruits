@@ -160,11 +160,10 @@ def propose():
 def recherche():
     return render_template('recherche.html', departements=DEPARTEMENTS)
 
-@app.route('/recherchecp',methods=['GET','POST'])
-def recherchecp():
-    propositions = db.execute("SELECT * FROM proposition")
+@app.route('/recherche/cp<int:codepostal>',methods=['GET','POST'])
+def recherchecp(codepostal:int):
+    propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville")
     return render_template('recherchercp', propositions=propositions)
-    
     
 @app.route('/map')
 def map():
