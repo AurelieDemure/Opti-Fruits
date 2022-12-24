@@ -6,54 +6,59 @@
     <div class="divcolumn maindiv">
         <div class="divprop space text textprop">Je propose</div>
         <div class="divprop form divcolumn">
-            <div class="divprop divrow space">
-                <div class="divprop divcolumn">
+            <form action="/propose" method="post" enctype=multipart/form-data>
+                <div class="divprop divrow space">
                     <div class="divprop divcolumn">
-                        <div class="divprop">Fruits / Légumes proposé :</div>
-                        <input class="inputcolor" name="frume" placeholder="ex : pommes">
-                    </div>
-                    <div class="divprop divcolumn">
-                        <div class="divprop">Quantité du produit :</div>
-                        <input class="inputcolor" name="quantite" placeholder="ex : 15 kg">
-                    </div>
-                    <div class="divprop divrow flex">
                         <div class="divprop divcolumn">
-                            <div class="divprop">Code postal :</div>
-                            <input class="inputcolor" name="codePostal" placeholder="ex : 54000">
+                            <div class="divprop">Fruits / Légumes proposé (*):</div>
+                            <input class="inputcolor" name="frume" placeholder="ex : pommes" value={{frume}}>
                         </div>
                         <div class="divprop divcolumn">
-                            <div class="divprop">Ville :</div>
-                            <input class="inputcolor" name="ville" placeholder="ex : Nancy">
+                            <div class="divprop">Quantité du produit en kg(*):</div>
+                            <input class="inputcolor" name="quantite" placeholder="ex : 15" value={{quantite}}>
+                        </div>
+                        <div class="divprop divrow flex">
+                            <div class="divprop divcolumn">
+                                <div class="divprop">Code postal (*):</div>
+                                <input class="inputcolor" name="codePostal" placeholder="ex : 54000" value={{codePostal}}>
+                            </div>
+                            <div class="divprop divcolumn">
+                                <div class="divprop">Ville (*):</div>
+                                <input class="inputcolor" name="ville" placeholder="ex : Nancy" value={{ville}}>
+                            </div>
+                        </div>
+                        <div class="divprop divcolumn">
+                            <div class="divprop">Description :</div>
+                            <textarea class="inputcolor" id="description" name="description" rows="20" cols="50" placeholder="informations, remarques, ..." value={{description}}></textarea>
                         </div>
                     </div>
                     <div class="divprop divcolumn">
-                        <div class="divprop">Description :</div>
-                        <textarea class="inputcolor" id="description" name="description" rows="20" cols="50" placeholder="informations, remarques, ..."></textarea>
+                        <div class="divprop divcolumn">
+                            <div class="divprop">Date de la cueillette (*):</div>
+                            <input class="inputcolor" name="dateCueillette" placeholder="ex : 12/06/2022" value={{dateCueillette}}>
+                        </div>
+                        <div class="divprop divcolumn">
+                            <div class="divprop">Date d'expiration de la demande (*):</div>
+                            <input class="inputcolor" name="dateFin" placeholder="ex : 14/06/2022" value={{dateFin}}>
+                        </div>
+                        <div class="divprop divrow flex">
+                            <input type="checkbox" id="cueillette" name="cueillette" value="Oui">
+                            <div class="divprop">Si les produits ne sont pas cueillis, 
+                                je propose aux personnes de venir les cueillir</div>
+                        </div>
+                        <div class="divprop divcolumn">
+                            <div class="divprop">Photo (png, jpg ou jpeg) :</div>
+                            <input type="file" name="photo">                 
+                        </div>
                     </div>
                 </div>
-                <div class="divprop divcolumn">
-                    <div class="divprop divcolumn">
-                        <div class="divprop">Date de la cueillette :</div>
-                        <input class="inputcolor" name="dateCueillette" placeholder="ex : 12/06/2022">
-                    </div>
-                    <div class="divprop divcolumn">
-                        <div class="divprop">Date d'expiration de la demande :</div>
-                        <input class="inputcolor" name="dateFin" placeholder="ex : 14/06/2022">
-                    </div>
-                    <div class="divprop divrow flex">
-                        <input type="checkbox" name="ceuillette">
-                        <div class="divprop">Si les produits ne sont pas cueillis, 
-                            je propose aux personnes de venir les cueillir</div>
-                    </div>
-                    <div class="divprop divcolumn">
-                        <div class="divprop">Photo :</div>
-                        <input type="file" name="photo">                 
+                <div class="divprop divcolumn space">
+                    <div class="divprop space error">{{message}}</div>
+                    <div class="divprop space">
+                        <input class="inscription" type="submit" value="VALIDER">
                     </div>
                 </div>
-            </div>
-            <div class="divprop divrow space">
-                <input class="inscription" type="submit" value="VALIDER">
-            </div>
+            </form>
         </div>
     </div>
 

@@ -1,0 +1,17 @@
+{%extends "connectedLayout.html"%}
+
+{%block body%}
+
+    <h1>Frume : {{frume}}</h1>
+    <h1>Quantité : {{quantite}} kg</h1>
+    <h1>Code Postal : {{codePostal}}</h1>
+    <h1>Ville : {{ville}}</h1>
+    <h1>Date de Cueillette : {{dateCueillette}}</h1>
+    <h1>Date de fin : {{dateFin}}</h1>
+    <h1>Cueillette : {{cueillette}}</h1>
+    <h1>Description : {{description}}</h1>
+    <h1>Photo : 
+        <img src={{url_for('static', filename="proposePictures/"+photo)}} alt="no picture"/>
+    </h1>
+
+{%endblock%}
