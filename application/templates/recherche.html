@@ -1,0 +1,21 @@
+{% extends "connectedLayout.html" %}
+{% block body %}
+
+    <h1>Recherche</h1>
+
+    <span>Veuillez renseignez votre code postal ou votre département</span>
+
+    <form action="/recherchecp" method="post">
+        <input autocomplete="off" autofocus name="Code Postal" placeholder="Code Postal" type="text">
+        <input type="submit" value="Valider">
+    </form>
+
+    <form action="/recherchedpt" method="post">
+        <select name="Départements">
+            {% for departement in departements %}
+                <option value="{{ departements[departement] }}">{{ departements[departement] }}</option>
+            {% endfor %}
+        <input type="submit" value="Valider">
+    </form>
+
+{%endblock%}

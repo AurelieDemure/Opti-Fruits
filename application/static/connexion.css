@@ -37,3 +37,7 @@
     max-width: 30%;
     align-self: center;
 }
+
+.message {
+    text-align:center;
+}
