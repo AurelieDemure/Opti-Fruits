@@ -200,11 +200,6 @@ def inscription():
         connection.commit()
         connection.close()
         return render_template("profil.html")
-       
-        
-
-
-
 
 @app.route('/map')
 def map():
@@ -224,7 +219,6 @@ def profil():
         else:
             propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur1[2])            
             return render_template("profil.html",utilisateur=utilisateur1,propositions=propositions)
-
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
@@ -255,7 +249,14 @@ def propose():
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
+        maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
+        if maxNoProp[0]["maxnoprop"]==None:
+            maxNoProp[0]["maxnoprop"]=-1
+        noProp=int(maxNoProp[0]["maxnoprop"])+1
+        db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "unknown", noProp, frume, quantite, ville, codePostal, dateCueillette, cueillette, dateFin, description, filename)
+        #return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
+        proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
+        return render_template("proposition.html", proposition=proposition)
 
 @app.route('/recherche', methods=['GET','POST'])
 def recherche():

@@ -2,16 +2,16 @@
 
 {%block body%}
 
-    <h1>Frume : {{frume}}</h1>
-    <h1>Quantité : {{quantite}} kg</h1>
-    <h1>Code Postal : {{codePostal}}</h1>
-    <h1>Ville : {{ville}}</h1>
-    <h1>Date de Cueillette : {{dateCueillette}}</h1>
-    <h1>Date de fin : {{dateFin}}</h1>
-    <h1>Cueillette : {{cueillette}}</h1>
-    <h1>Description : {{description}}</h1>
+    <h1>Frume : {{proposition[0]["nomfrumes"]}}</h1>
+    <h1>Quantité : {{proposition[0]["quantite"]}} kg</h1>
+    <h1>Code Postal : {{proposition[0]["codepostal"]}}</h1>
+    <h1>Ville : {{proposition[0]["ville"]}}</h1>
+    <h1>Date de Cueillette : {{proposition[0]["datecueillette"]}}</h1>
+    <h1>Date de fin : {{proposition[0]["dateexpiration"]}}</h1>
+    <h1>Cueillette : {{proposition[0]["cueillette"]}}</h1>
+    <h1>Description : {{proposition[0]["description"]}}</h1>
     <h1>Photo : 
-        <img src={{url_for('static', filename="proposePictures/"+photo)}} alt="no picture"/>
+        <img src={{url_for('static', filename="proposePictures/"+proposition[0]["propositionphoto"])}} alt="no picture"/>
     </h1>
 
 {%endblock%}
