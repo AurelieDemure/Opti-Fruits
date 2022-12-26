@@ -1,4 +1,5 @@
 import os
+import sqlite3
 from cs50 import SQL
 from flask import Flask, render_template, request, redirect
 from werkzeug.utils import secure_filename
@@ -169,9 +170,41 @@ def connexion():
 def connexion2(message:str):
     return render_template("connexion.html",message=message)
 
-@app.route('/inscription')
+
+@app.route('/inscription', methods=['GET','POST'])
 def inscription():
-    return render_template("inscription.html")
+    if request.method=='GET':
+        return render_template("inscription.html")
+    if request.method=='POST':
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        pseudo = request.form.get("pseudo")
+        tel = request.form.get("tel")
+        mail = request.form.get("mail")
+        password = request.form.get("password")
+        mention = request.form.get("mention")
+        if not nom :
+            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not prenom :
+            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not pseudo :
+            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not tel :
+            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not mail :
+            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not password :
+            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        connection = sqlite3.connect('bd2.db')
+        connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
+        connection.commit()
+        connection.close()
+        return render_template("profil.html")
+       
+        
+
+
+
 
 @app.route('/map')
 def map():
