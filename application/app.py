@@ -4,7 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, request, redirect
 from werkzeug.utils import secure_filename
 
-db= SQL('sqlite:///bd.db')
+db= SQL('sqlite:///bd2.db')
 
 UPLOAD_FOLDER='./static/proposePictures'
 ALLOWED_EXTENSIONS={'png','jpg','jpeg'}
@@ -217,12 +217,14 @@ def profil():
     elif request.form['Mot de passe']=='':
         return redirect('/connexion/Veuillez rentrer votre mot de passe')
     else:
-        utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=? and password=?",request.form['Email'],request.form['Mot de passe'])
-        if utilisateur is None:
+        utilisateur1=db.execute("SELECT * FROM utilisateur WHERE mail==?",request.form['Email'])
+        utilisateur2=db.execute("SELECT * FROM utilisateur WHERE password==?",request.form['Mot de passe'])
+        if utilisateur1!=utilisateur2:
              return redirect('/connexion/Adresse mail ou mot de passe incorrect')
         else:
-            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur[2])
-            return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
+            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur1[2])            
+            return render_template("profil.html",utilisateur=utilisateur1,propositions=propositions)
+
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
