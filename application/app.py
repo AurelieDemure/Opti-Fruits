@@ -40,7 +40,23 @@ def assos():
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
-    return render_template("connexion.html",message=' ')
+    if request.method=='GET':
+        return render_template("connexion.html")
+    if request.method=='POST':
+        mail=request.form.get("mail")
+        password=request.form.get("password")
+        if not mail : 
+            return render_template("connexion.html", message="Veuillez renseigner votre adresse mail", password=password)
+        if not password : 
+            return render_template("connexion.html", message="Veuillez renseigner votre mot de passe", mail=mail)
+        connexion = sqlite3.connect('bd3.db')
+        infos = connexion.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
+        connexion.commit()
+        connexion.close()
+        if infos[5]==password:
+            return render_template("profil.html", infos=infos)
+        else:
+            return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
 @app.route('/connexion/<string:message>',methods=['GET','POST'])
 def connexion2(message:str):
@@ -71,11 +87,11 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
         if not password :
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        connection = sqlite3.connect('bd2.db')
+        connection = sqlite3.connect('bd3.db')
         connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
         connection.commit()
         connection.close()
-        return render_template("profil.html")
+        return render_template("profil.html", nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
 
 @app.route('/map')
 def map():
