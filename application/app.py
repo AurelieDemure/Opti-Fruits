@@ -75,7 +75,7 @@ def inscription():
         connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
         connection.commit()
         connection.close()
-        return render_template("profil.html")
+        return redirect('/connexion')
 
 @app.route('/map')
 def map():
@@ -88,13 +88,14 @@ def profil():
     elif request.form['Mot de passe']=='':
         return redirect('/connexion/Veuillez rentrer votre mot de passe')
     else:
-        utilisateur1=db.execute("SELECT * FROM utilisateur WHERE mail==?",request.form['Email'])
-        utilisateur2=db.execute("SELECT * FROM utilisateur WHERE password==?",request.form['Mot de passe'])
-        if utilisateur1!=utilisateur2:
+        utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=? AND password=?",request.form['Email'],request.form['Mot de passe'])
+        if utilisateur==[]:
              return redirect('/connexion/Adresse mail ou mot de passe incorrect')
         else:
-            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur1[2])            
-            return render_template("profil.html",utilisateur=utilisateur1,propositions=propositions)
+            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur            
+            return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
+
+
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
