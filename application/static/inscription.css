@@ -16,7 +16,7 @@
     align-content: center;
     scroll-padding-block-end: 5%;
     width: fit-content;
-    width : 30%
+    border: 2em;
     }
 
 .Contact {
@@ -24,14 +24,12 @@
     flex-direction: row;
     align-self: center;
     align-content: center;
-    width: 30%;
 }
 
 .Autres {
     display: block;
     flex-direction: row;
     align-self: center;
-    width: 30%;
 }
 
 .Text {
@@ -47,3 +45,6 @@
     align-self: center;
 }
 
+.erreur {
+    color: red
+}
