@@ -20,6 +20,144 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@app.route('/',methods=['GET','POST'])
+def homeDev():
+    if request.method=='GET':
+        navbar='unconnectedLayout'
+    if request.method=='POST':
+        navbar='connectedLayout'
+    return render_template('home.html',navbar=navbar)
+
+@app.route('/associations')
+def assos():
+    print(request)
+    if request.args.get('q') is not None:
+        assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
+    else:
+        assos=db.execute("SELECT * FROM association ORDER BY ville")
+    return render_template("Assos.html",assos=assos)
+
+@app.route('/connexion',methods=['GET','POST'])
+def connexion():
+    return render_template("connexion.html",message=' ')
+
+@app.route('/connexion/<string:message>',methods=['GET','POST'])
+def connexion2(message:str):
+    return render_template("connexion.html",message=message)
+
+
+@app.route('/inscription', methods=['GET','POST'])
+def inscription():
+    if request.method=='GET':
+        return render_template("inscription.html")
+    if request.method=='POST':
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        pseudo = request.form.get("pseudo")
+        tel = request.form.get("tel")
+        mail = request.form.get("mail")
+        password = request.form.get("password")
+        mention = request.form.get("mention")
+        if not nom :
+            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not prenom :
+            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not pseudo :
+            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not tel :
+            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not mail :
+            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        if not password :
+            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+        connection = sqlite3.connect('bd2.db')
+        connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
+        connection.commit()
+        connection.close()
+        return render_template("profil.html")
+
+@app.route('/map')
+def map():
+    return render_template("map.html")
+
+@app.route('/profil',methods=['GET','POST'])
+def profil():
+    if request.form['Email']=='':
+        return redirect('/connexion/Veuillez renseigner votre adresse mail')    
+    elif request.form['Mot de passe']=='':
+        return redirect('/connexion/Veuillez rentrer votre mot de passe')
+    else:
+        utilisateur1=db.execute("SELECT * FROM utilisateur WHERE mail==?",request.form['Email'])
+        utilisateur2=db.execute("SELECT * FROM utilisateur WHERE password==?",request.form['Mot de passe'])
+        if utilisateur1!=utilisateur2:
+             return redirect('/connexion/Adresse mail ou mot de passe incorrect')
+        else:
+            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur1[2])            
+            return render_template("profil.html",utilisateur=utilisateur1,propositions=propositions)
+
+@app.route('/propose',methods=['GET','POST'])
+def propose():
+    if request.method=='GET':
+        return render_template("propose.html",message='')
+    if request.method=='POST':
+        frume=request.form.get("frume")
+        quantite=request.form.get("quantite")
+        codePostal=request.form.get("codePostal")
+        ville=request.form.get("ville")
+        dateCueillette=request.form.get("dateCueillette")
+        dateFin=request.form.get("dateFin")
+        cueillette=request.form.get("cueillette")
+        description=request.form.get("description")
+        photo=request.files['photo']
+        if not frume:
+            return render_template("propose.html",message='veuillez entrer un fruit ou légume',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+        if not quantite:
+            return render_template("propose.html",message='veuillez entrer une quantité',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+        if not codePostal:
+            return render_template("propose.html",message='veuillez entrer un code postal',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+        if not ville:
+            return render_template("propose.html",message='veuillez entrez une ville',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+        if not dateCueillette:
+            return render_template("propose.html",message='veuillez entrer une date de cueillette',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+        if not dateFin:
+            return render_template("propose.html",message='veuillez entrer une date de fin',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+        if photo and allowed_file(photo.filename):
+            filename = secure_filename(photo.filename)
+            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
+        if maxNoProp[0]["maxnoprop"]==None:
+            maxNoProp[0]["maxnoprop"]=-1
+        noProp=int(maxNoProp[0]["maxnoprop"])+1
+        db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "unknown", noProp, frume, quantite, ville, codePostal, dateCueillette, cueillette, dateFin, description, filename)
+        #return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
+        proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
+        return render_template("proposition.html", proposition=proposition)
+
+@app.route('/recherche', methods=['GET','POST'])
+def recherche():
+    if request.method=='GET':
+        return render_template("recherche.html",message='',departements=DEPARTEMENTS)
+    if request.method=='POST':
+        codePostal=request.form.get("Code Postal")
+        departement=request.form.get("Départements")
+        if not codePostal and not departement:
+            return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS)
+        else:
+            if codePostal:
+                return render_template("recherchecp.html")
+
+@app.route('/recherchecp',methods=['GET','POST'])
+def recherchecp(codepostal:int):
+    propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville")
+    return render_template('recherchercp.html', propositions=propositions)
+
+@app.route('/TODO')
+def todo():
+    return render_template("TODO.html")
+
+
+
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],
     'Bourgogne-Franche-Comté': ['21', '25', '39', '58', '70', '71', '89', '90'],
@@ -143,130 +281,3 @@ DEPARTEMENTS = {
     '974': 'La Réunion', 
     '976': 'Mayotte',
 }
-
-
-@app.route('/',methods=['GET','POST'])
-def homeDev():
-    if request.method=='GET':
-        navbar='unconnectedLayout'
-    if request.method=='POST':
-        navbar='connectedLayout'
-    return render_template('home.html',navbar=navbar)
-
-@app.route('/associations')
-def assos():
-    print(request)
-    if request.args.get('q') is not None:
-        assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
-    else:
-        assos=db.execute("SELECT * FROM association ORDER BY ville")
-    return render_template("Assos.html",assos=assos)
-
-@app.route('/connexion',methods=['GET','POST'])
-def connexion():
-    return render_template("connexion.html",message=' ')
-
-@app.route('/connexion/<string:message>',methods=['GET','POST'])
-def connexion2(message:str):
-    return render_template("connexion.html",message=message)
-
-
-@app.route('/inscription', methods=['GET','POST'])
-def inscription():
-    if request.method=='GET':
-        return render_template("inscription.html")
-    if request.method=='POST':
-        nom = request.form.get("nom")
-        prenom = request.form.get("prenom")
-        pseudo = request.form.get("pseudo")
-        tel = request.form.get("tel")
-        mail = request.form.get("mail")
-        password = request.form.get("password")
-        mention = request.form.get("mention")
-        if not nom :
-            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        if not prenom :
-            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        if not pseudo :
-            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        if not tel :
-            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        if not mail :
-            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        if not password :
-            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        connection = sqlite3.connect('bd2.db')
-        connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
-        connection.commit()
-        connection.close()
-        return render_template("profil.html")
-
-@app.route('/map')
-def map():
-    return render_template("map.html")
-
-@app.route('/profil',methods=['GET','POST'])
-def profil():
-    if request.form['Email']=='':
-        return redirect('/connexion/Veuillez renseigner votre adresse mail')    
-    elif request.form['Mot de passe']=='':
-        return redirect('/connexion/Veuillez rentrer votre mot de passe')
-    else:
-        utilisateur1=db.execute("SELECT * FROM utilisateur WHERE mail==?",request.form['Email'])
-        utilisateur2=db.execute("SELECT * FROM utilisateur WHERE password==?",request.form['Mot de passe'])
-        if utilisateur1!=utilisateur2:
-             return redirect('/connexion/Adresse mail ou mot de passe incorrect')
-        else:
-            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur1[2])            
-            return render_template("profil.html",utilisateur=utilisateur1,propositions=propositions)
-
-@app.route('/propose',methods=['GET','POST'])
-def propose():
-    if request.method=='GET':
-        return render_template("propose.html",message='')
-    if request.method=='POST':
-        frume=request.form.get("frume")
-        quantite=request.form.get("quantite")
-        codePostal=request.form.get("codePostal")
-        ville=request.form.get("ville")
-        dateCueillette=request.form.get("dateCueillette")
-        dateFin=request.form.get("dateFin")
-        cueillette=request.form.get("cueillette")
-        description=request.form.get("description")
-        photo=request.files['photo']
-        if not frume:
-            return render_template("propose.html",message='veuillez entrer un fruit ou légume',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
-        if not quantite:
-            return render_template("propose.html",message='veuillez entrer une quantité',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
-        if not codePostal:
-            return render_template("propose.html",message='veuillez entrer un code postal',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
-        if not ville:
-            return render_template("propose.html",message='veuillez entrez une ville',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
-        if not dateCueillette:
-            return render_template("propose.html",message='veuillez entrer une date de cueillette',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
-        if not dateFin:
-            return render_template("propose.html",message='veuillez entrer une date de fin',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
-        if photo and allowed_file(photo.filename):
-            filename = secure_filename(photo.filename)
-            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
-        if maxNoProp[0]["maxnoprop"]==None:
-            maxNoProp[0]["maxnoprop"]=-1
-        noProp=int(maxNoProp[0]["maxnoprop"])+1
-        db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "unknown", noProp, frume, quantite, ville, codePostal, dateCueillette, cueillette, dateFin, description, filename)
-        #return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
-        proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
-        return render_template("proposition.html", proposition=proposition)
-
-@app.route('/recherche', methods=['GET','POST'])
-def recherche():
-    return render_template('recherche.html', departements=DEPARTEMENTS)
-
-@app.route('/recherche/cp<int:codepostal>',methods=['GET','POST'])
-def recherchecp(codepostal:int):
-    propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville")
-    return render_template('recherchercp', propositions=propositions)
-
-@app.route('/TODO')
-def todo():
-    return render_template("TODO.html")

@@ -5,17 +5,24 @@
 
     <span>Veuillez renseignez votre code postal ou votre département</span>
 
-    <form action="/recherchecp" method="post">
-        <input autocomplete="off" autofocus name="Code Postal" placeholder="Code Postal" type="text">
-        <input type="submit" value="Valider">
-    </form>
+    <div class="form">
+        <form action="/recherche" method="post">
+            <input autocomplete="off" autofocus name="Code Postal" placeholder="Code Postal" type="text">
+            <input type="submit" value="Valider">
+        </form>
 
-    <form action="/recherchedpt" method="post">
-        <select name="Départements">
-            {% for departement in departements %}
-                <option value="{{ departements[departement] }}">{{ departements[departement] }}</option>
-            {% endfor %}
-        <input type="submit" value="Valider">
-    </form>
+        <form action="/recherche" method="post">
+            <select name="Départements">
+                <option disabled selected value="">Département</option>
+                {% for departement in departements %}
+                    <option value="{{ departements[departement] }}">{{ departements[departement] }}</option>
+                {% endfor %}
+            <input type="submit" value="Valider">
+        </form>
+    </div>
+    <div class="error message">
+        <p class='message'>{{message}}</p>
+    </div>
+
 
 {%endblock%}
