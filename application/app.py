@@ -50,11 +50,13 @@ def connexion():
         if not password : 
             return render_template("connexion.html", message="Veuillez renseigner votre mot de passe", mail=mail)
         connexion = sqlite3.connect('bd3.db')
-        infos = connexion.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
+        nom = connexion.execute("SELECT nom FROM utilisateur WHERE mail=?", mail)
+        prenom = connexion.execute("SELECT prenom FROM utilisateur WHERE mail=?", mail)
+        # nom,prenom,pseudo,tel,mail,password2,mention = connexion.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
         connexion.commit()
         connexion.close()
-        if infos[5]==password:
-            return render_template("profil.html", infos=infos)
+        if password2==password:
+            return render_template("profil.html", nom=nom, prenom=prenom, pesudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
@@ -74,28 +76,30 @@ def inscription():
         tel = request.form.get("tel")
         mail = request.form.get("mail")
         password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
         mention = request.form.get("mention")
         if not nom :
-            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
         if not prenom :
-            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
         if not pseudo :
-            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
         if not tel :
-            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
         if not mail :
-            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
         if not password :
-            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
+        if not confirm_password : 
+            return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
+        if password!=confirm_password :
+            return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
         connection = sqlite3.connect('bd3.db')
         connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
         connection.commit()
         connection.close()
-<<<<<<< HEAD
         return render_template("profil.html", nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-=======
         return redirect('/connexion')
->>>>>>> 45dc3b0ef5fc621f28081e83934c3770b2bb2643
 
 @app.route('/map')
 def map():
@@ -112,7 +116,7 @@ def profil():
         if utilisateur==[]:
              return redirect('/connexion/Adresse mail ou mot de passe incorrect')
         else:
-            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur            
+            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur)            
             return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
 
 
