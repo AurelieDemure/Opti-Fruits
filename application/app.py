@@ -50,9 +50,10 @@ def connexion():
         if not password : 
             return render_template("connexion.html", message="Veuillez renseigner votre mot de passe", mail=mail)
         connexion = sqlite3.connect('bd3.db')
-        nom = connexion.execute("SELECT nom FROM utilisateur WHERE mail=?", mail)
-        prenom = connexion.execute("SELECT prenom FROM utilisateur WHERE mail=?", mail)
-        # nom,prenom,pseudo,tel,mail,password2,mention = connexion.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
+        #nom = connexion.execute("SELECT nom FROM utilisateur WHERE mail=?", mail)
+        #prenom = connexion.execute("SELECT prenom FROM utilisateur WHERE mail=?", mail)
+        password2= connexion.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
+        pseudo=connexion.execute("SELECT pseudo FROM utilisateur WHERE mail=?",mail)
         connexion.commit()
         connexion.close()
         if password2==password:
