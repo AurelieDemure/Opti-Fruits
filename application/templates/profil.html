@@ -2,14 +2,13 @@
 {% block body %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='profil.css')}}">
 
-<div class="photo">
-        <img src="/static/"+{{utilisateur.photo}}/>
-</div>
-<div class="informations_utilisateur">
-        <p class="nom">{{utilisateur.prenom}} {{utilisateur.nom}}</p>
-        <p class="pseudo">aka {{utilisateur.pseudo}}</p>
-        <p class="mention">{{utilisateur.mention}}</p>
-</div>
+{%for user in utilisateur%}
+    <div class="informations_utilisateur">
+        <p class="nom">{{user.prenom}} {{user.nom}}</p>
+        <p class="pseudo">aka {{user.pseudo}}</p>
+        <p class="mention">{{user.mention}}</p>
+    </div>
+{%endfor%}
 
 <div class="propositions">
     {%for proposition in propositions%}

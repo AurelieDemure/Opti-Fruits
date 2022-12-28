@@ -1,0 +1,17 @@
+.informations_utilisateur {
+    margin: 5em;
+    margin-left:20em;
+    margin-right:20em;
+    padding:2em;
+    background-color: white;
+    border:var(--dark-pink);
+}
+
+.nom {
+    color:var(--dark-pink);
+}
+
+.mention {
+    color:grey;
+    padding-top: 5em;
+}

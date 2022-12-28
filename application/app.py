@@ -4,7 +4,7 @@ from cs50 import SQL
 from flask import Flask, render_template, request, redirect
 from werkzeug.utils import secure_filename
 
-db= SQL('sqlite:///bd2.db')
+db= SQL('sqlite:///bd3.db')
 
 UPLOAD_FOLDER='./static/proposePictures'
 ALLOWED_EXTENSIONS={'png','jpg','jpeg'}
@@ -49,19 +49,12 @@ def connexion():
             return render_template("connexion.html", message="Veuillez renseigner votre adresse mail", password=password)
         if not password : 
             return render_template("connexion.html", message="Veuillez renseigner votre mot de passe", mail=mail)
-        connexion = sqlite3.connect('bd3.db')
-        password2 = connexion.execute("SELECT password FROM utilisateur WHERE mail=?",(mail,))
-        pseudo=connexion.execute("SELECT pseudo FROM utilisateur WHERE mail=?",(mail,))
-        connexion.commit()
-        connexion.close()
+        password=db.execute("SELECT password FROM utilisateur WHERE password=?",password)
+        password2=db.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
         if password2 == password:
-            return redirect('/profil/'+pseudo)
+            return redirect('/profil/'+mail)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
-
-@app.route('/connexion/<string:message>',methods=['GET','POST'])
-def connexion2(message:str):
-    return render_template("connexion.html",message=message)
 
 
 @app.route('/inscription', methods=['GET','POST'])
@@ -97,16 +90,16 @@ def inscription():
         connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
         connection.commit()
         connection.close()
-        return redirect('/profil'+pseudo)
+        return redirect('/profil/'+str(pseudo))
 
 @app.route('/map')
 def map():
     return render_template("map.html")
 
-@app.route('/profil/<string:pseudo>')
-def profil(pseudo:str):
-    utilisateur=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",pseudo)
-    propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",pseudo)            
+@app.route('/profil/<string:mail>')
+def profil(mail:str):
+    utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
+    propositions=db.execute("SELECT * FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE u.mail=?",mail)            
     return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
 
 
