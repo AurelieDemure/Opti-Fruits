@@ -56,7 +56,8 @@ def connexion():
         connexion.commit()
         connexion.close()
         if password2==password:
-            return render_template("profil.html", nom=nom, prenom=prenom, pesudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            #return render_template("profil.html", nom=nom, prenom=prenom, pesudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
+            return redirect('/profil/'+pseudo)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
@@ -98,26 +99,17 @@ def inscription():
         connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
         connection.commit()
         connection.close()
-        return render_template("profil.html", nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-        return redirect('/connexion')
+        return redirect('/profil'+pseudo)
 
 @app.route('/map')
 def map():
     return render_template("map.html")
 
-@app.route('/profil',methods=['GET','POST'])
-def profil():
-    if request.form['Email']=='':
-        return redirect('/connexion/Veuillez renseigner votre adresse mail')    
-    elif request.form['Mot de passe']=='':
-        return redirect('/connexion/Veuillez rentrer votre mot de passe')
-    else:
-        utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=? AND password=?",request.form['Email'],request.form['Mot de passe'])
-        if utilisateur==[]:
-             return redirect('/connexion/Adresse mail ou mot de passe incorrect')
-        else:
-            propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",utilisateur)            
-            return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
+@app.route('/profil/<string:pseudo>')
+def profil(pseudo:str):
+    utilisateur=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",pseudo)
+    propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",pseudo)            
+    return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
 
 
 
