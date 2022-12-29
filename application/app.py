@@ -91,11 +91,7 @@ def inscription():
         connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
         connection.commit()
         connection.close()
-<<<<<<< HEAD
-        return render_template("profil.html", nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, mention=mention)
-=======
         return redirect('/connexion')
->>>>>>> 45dc3b0ef5fc621f28081e83934c3770b2bb2643
 
 @app.route('/map')
 def map():
