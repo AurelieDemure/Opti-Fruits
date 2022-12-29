@@ -1,8 +1,9 @@
 import os
 import sqlite3
 from cs50 import SQL
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from werkzeug.utils import secure_filename
+from flask_session import Session
 
 db= SQL('sqlite:///bd3.db')
 
@@ -13,7 +14,10 @@ app=Flask(__name__,
     static_folder="./static",
     template_folder="./templates")
 
+app.config["SESSION_PERMANENT"]=False
+app.config["SESSION_TYPE"]='filesystem'
 app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
+Session(app)
 
 #pour verifier que le fichier selectionné est bien du bon format
 def allowed_file(filename):
@@ -21,13 +25,15 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/',methods=['GET','POST'])
+@app.route('/')
 def homeDev():
-    if request.method=='GET':
+    if not session.get("name"):
         navbar='unconnectedLayout'
-    if request.method=='POST':
+        return render_template('home.html',navbar=navbar)
+    else:
         navbar='connectedLayout'
-    return render_template('home.html',navbar=navbar)
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        return render_template('home.html',navbar=navbar,profil=profil)
 
 @app.route('/associations')
 def assos():
@@ -36,7 +42,13 @@ def assos():
         assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
     else:
         assos=db.execute("SELECT * FROM association ORDER BY ville")
-    return render_template("Assos.html",assos=assos)
+    if not session.get("name"):
+        navbar='unconnectedLayout'
+        return render_template("Assos.html",assos=assos,navbar=navbar)
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil)
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
@@ -52,7 +64,9 @@ def connexion():
         password=db.execute("SELECT password FROM utilisateur WHERE password=?",password)
         password2=db.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
         if password2 == password:
-            return redirect('/profil/'+mail)
+            session["name"]=mail
+            profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+            return redirect('/profil/'+profil[0]["pseudo"])
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
@@ -93,7 +107,10 @@ def inscription():
         except sqlite3.IntegrityError : 
             return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
         connection.commit()
-        return redirect('/profil/'+mail)
+        # return redirect('/profil/'+mail)
+        connection.close()
+        session["name"]=mail
+        return redirect('/profil/'+str(pseudo))
 
 @app.route('/map')
 def map():
@@ -103,7 +120,12 @@ def map():
 def profil(mail:str):
     utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
     propositions=db.execute("SELECT * FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE u.mail=?",mail)            
-    return render_template("profil.html",utilisateur=utilisateur,propositions=propositions)
+    if session.get("name"):
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        return render_template("profil.html",utilisateur=utilisateur,propositions=propositions,navbar=navbar,profil=profil)
+    navbar='unconnectedLayout'
+    return render_template("profil.html",utilisateur=utilisateur,propositions=propositions,navbar=navbar)
 
 
 
@@ -148,24 +170,54 @@ def propose():
 @app.route('/recherche', methods=['GET','POST'])
 def recherche():
     if request.method=='GET':
-        return render_template("recherche.html",message='',departements=DEPARTEMENTS)
+        if not session.get("name"):
+            navbar='unconnectedLayout'
+            return render_template("recherche.html",message='',departements=DEPARTEMENTS,navbar=navbar)
+        else:
+            navbar='connectedLayout'
+            profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+            return render_template("recherche.html",message='',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
     if request.method=='POST':
         codePostal=request.form.get("Code Postal")
         departement=request.form.get("Départements")
         if not codePostal and not departement:
-            return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS)
+            if not session.get("name"):
+                navbar='unconnectedLayout'
+                return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar)
+            else:
+                navbar='connectedLayout'
+                profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
         else:
             if codePostal:
-                return render_template("recherchecp.html")
+                if not session.get("name"):
+                    navbar='unconnectedLayout'
+                    return render_template("recherchecp.html",navbar=navbar)
+                else:
+                    navbar='connectedLayout'
+                    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                    return render_template("recherchecp.html",navbar=navbar,profil=profil)
 
 @app.route('/recherchecp',methods=['GET','POST'])
 def recherchecp(codepostal:int):
     propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville")
-    return render_template('recherchercp.html', propositions=propositions)
+    if not session.get("name"):
+        navbar='unconnectedLayout'
+        return render_template('recherchercp.html', propositions=propositions,navbar=navbar)
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        return render_template('recherchercp.html', propositions=propositions,navbar=navbar,profil=profil)
 
 @app.route('/TODO')
 def todo():
-    return render_template("TODO.html")
+    if not session.get("name"):
+        navbar='unconnectedLayout'
+        return render_template("TODO.html",navbar=navbar)
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        return render_template("TODO.html",navbar=navbar,profil=profil)
 
 
 
