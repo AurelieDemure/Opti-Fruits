@@ -17,6 +17,7 @@
     scroll-padding-block-end: 5%;
     width: fit-content;
     border: 2em;
+    border-style: solid;
     }
 
 .Contact {
