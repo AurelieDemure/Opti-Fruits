@@ -3,7 +3,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='connexion.css') }}">
 
     <div class="page">
-        <form action="/connexion" method="POST" enctype=multipart/form-data> 
+        <form class="form" action="/connexion" method="POST" enctype=multipart/form-data> 
             <div class="Text">Email</div>
             <input id="Email" name="mail" type="text" placeholder="ex : xyz@optifruit.fr" value={{mail}}>
             <div class="Text">Mot de passe</div>
