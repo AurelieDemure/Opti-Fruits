@@ -1,10 +1,13 @@
 .informations_utilisateur {
     margin: 5em;
-    margin-left:20em;
-    margin-right:20em;
+    margin-left:15em;
+    margin-right:15em;
     padding:2em;
     background-color: white;
-    border:var(--dark-pink);
+    border-width: 3px;
+    border-style: solid;
+    border-color :var(--dark-pink);
+    font-size:1.5em;
 }
 
 .nom {
