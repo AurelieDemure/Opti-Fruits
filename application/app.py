@@ -52,6 +52,8 @@ def assos():
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
+    if session.get("name"):
+        return redirect("/")
     if request.method=='GET':
         return render_template("connexion.html")
     if request.method=='POST':
@@ -73,6 +75,8 @@ def connexion():
 
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
+    if session.get("name"):
+        return redirect("/")
     if request.method=='GET':
         return render_template("inscription.html")
     if request.method=='POST':
@@ -111,10 +115,6 @@ def inscription():
         connection.close()
         session["name"]=mail
         return redirect('/profil/'+mail)
-
-@app.route('/map')
-def map():
-    return render_template("map.html")
 
 @app.route('/profil/<string:mail>')
 def profil(mail:str):
