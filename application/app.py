@@ -29,7 +29,7 @@ def allowed_file(filename):
 def homeDev():
     if not session.get("name"):
         navbar='unconnectedLayout'
-        return render_template('home.html',navbar=navbar)
+        return render_template('TODO.html',navbar=navbar)
     else:
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
@@ -52,6 +52,8 @@ def assos():
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
+    if session.get("name"):
+        return redirect("/")
     if request.method=='GET':
         return render_template("connexion.html")
     if request.method=='POST':
@@ -73,6 +75,8 @@ def connexion():
 
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
+    if session.get("name"):
+        return redirect("/")
     if request.method=='GET':
         return render_template("inscription.html")
     if request.method=='POST':
@@ -84,37 +88,39 @@ def inscription():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
         mention = request.form.get("mention")
+        profilphoto=request.form.get("profilphoto")
         if not nom :
-            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if not prenom :
-            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre prénom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not pseudo :
-            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre pseudo', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not tel :
-            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not mail :
-            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not password :
-            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention)
+            return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not confirm_password : 
-            return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
+            return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
-            return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
+            return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+        # if not profilphoto in ALLOWED_EXTENSIONS:
+        #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+        if profilphoto and allowed_file(profilphoto.filename):
+            filename = secure_filename(profilphoto.filename)
+            profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         connection = sqlite3.connect('bd3.db')
         try : 
             connection = sqlite3.connect('bd3.db')
-            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")   
+            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
         except sqlite3.IntegrityError : 
-            return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
+            return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         connection.commit()
         # return redirect('/profil/'+mail)
         connection.close()
         session["name"]=mail
         return redirect('/profil/'+mail)
-
-@app.route('/map')
-def map():
-    return render_template("map.html")
 
 @app.route('/profil/<string:mail>')
 def profil(mail:str):
@@ -131,8 +137,12 @@ def profil(mail:str):
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
+    if not session.get("name"):
+        return redirect("/connexion")
+    navbar='connectedLayout'
+    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
     if request.method=='GET':
-        return render_template("propose.html",message='')
+        return render_template("propose.html",message='',navbar=navbar,profil=profil)
     if request.method=='POST':
         frume=request.form.get("frume")
         quantite=request.form.get("quantite")
@@ -144,17 +154,17 @@ def propose():
         description=request.form.get("description")
         photo=request.files['photo']
         if not frume:
-            return render_template("propose.html",message='veuillez entrer un fruit ou légume',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+            return render_template("propose.html",message='veuillez entrer un fruit ou légume',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if not quantite:
-            return render_template("propose.html",message='veuillez entrer une quantité',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+            return render_template("propose.html",message='veuillez entrer une quantité',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if not codePostal:
-            return render_template("propose.html",message='veuillez entrer un code postal',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+            return render_template("propose.html",message='veuillez entrer un code postal',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if not ville:
-            return render_template("propose.html",message='veuillez entrez une ville',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+            return render_template("propose.html",message='veuillez entrez une ville',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if not dateCueillette:
-            return render_template("propose.html",message='veuillez entrer une date de cueillette',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+            return render_template("propose.html",message='veuillez entrer une date de cueillette',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if not dateFin:
-            return render_template("propose.html",message='veuillez entrer une date de fin',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description)
+            return render_template("propose.html",message='veuillez entrer une date de fin',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -165,7 +175,7 @@ def propose():
         db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "unknown", noProp, frume, quantite, ville, codePostal, dateCueillette, cueillette, dateFin, description, filename)
         #return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
         proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
-        return render_template("proposition.html", proposition=proposition)
+        return render_template("proposition.html", proposition=proposition,navbar=navbar,profil=profil)
 
 @app.route('/recherche', methods=['GET','POST'])
 def recherche():
