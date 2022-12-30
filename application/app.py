@@ -207,24 +207,14 @@ def recherche():
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
         else:
             if codePostal:
+                propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville", codePostal)
                 if not session.get("name"):
                     navbar='unconnectedLayout'
-                    return render_template("recherchecp.html",navbar=navbar)
+                    return render_template("recherchecp.html",navbar=navbar,propositions=propositions)
                 else:
                     navbar='connectedLayout'
                     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-                    return render_template("recherchecp.html",navbar=navbar,profil=profil)
-
-@app.route('/recherchecp',methods=['GET','POST'])
-def recherchecp(codepostal:int):
-    propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville")
-    if not session.get("name"):
-        navbar='unconnectedLayout'
-        return render_template('recherchercp.html', propositions=propositions,navbar=navbar)
-    else:
-        navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template('recherchercp.html', propositions=propositions,navbar=navbar,profil=profil)
+                    return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions)
 
 @app.route('/TODO')
 def todo():
