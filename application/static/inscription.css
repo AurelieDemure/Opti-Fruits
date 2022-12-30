@@ -14,10 +14,9 @@
     flex-direction: row;
     align-self: center;
     align-content: center;
-    scroll-padding-block-end: 5%;
     width: fit-content;
     border: 2em;
-    border-style: solid;
+    margin-bottom: 300px;
     }
 
 .Contact {
@@ -25,25 +24,29 @@
     flex-direction: row;
     align-self: center;
     align-content: center;
+    margin-bottom: 300px;
 }
 
 .Autres {
     display: block;
     flex-direction: row;
     align-self: center;
+    margin-bottom: 30px;
 }
 
 .Text {
     color: black;
     size: 10%;
+    margin-bottom: 5px;
 }
 
-#submit{
-    background-color: #fcbcb8ff;
-    border: 5%;
+.input{
     border-color: black;
-    max-width: 30%;
-    align-self: center;
+    text-align: center;
+    display: block;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 10px;
 }
 
 .erreur {

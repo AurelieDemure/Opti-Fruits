@@ -66,7 +66,7 @@ def connexion():
         if password2 == password:
             session["name"]=mail
             profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-            return redirect('/profil/'+profil[0]["pseudo"])
+            return redirect('/profil/'+mail)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
@@ -101,11 +101,16 @@ def inscription():
         if password!=confirm_password :
             return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
         connection = sqlite3.connect('bd3.db')
-        connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")
+        try : 
+            connection = sqlite3.connect('bd3.db')
+            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"')")   
+        except sqlite3.IntegrityError : 
+            return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention)
         connection.commit()
+        # return redirect('/profil/'+mail)
         connection.close()
         session["name"]=mail
-        return redirect('/profil/'+str(pseudo))
+        return redirect('/profil/'+mail)
 
 @app.route('/map')
 def map():
