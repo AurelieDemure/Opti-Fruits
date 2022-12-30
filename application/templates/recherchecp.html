@@ -6,12 +6,12 @@
     <div class="propositions">
         {%for proposition in propositions%}
             <div class="proposition">
-                <img class="photo_perso" src='/static'+{{utilisateur.photo}}>
                 <p class="pseudo">{{proposition.pseudo}}</p>
                 <p class="description">{{proposition.description}}</p>
-                <img class="photo_prop" src='/static'+{{proposition.photo}}>
+                <img class="photo_prop" src='/static'+{{proposition.propositionphoto}}>
             </div>
         {%endfor%}
     </div>
+    <p class='message'>{{dep}}</p>
     
 {%endblock%}

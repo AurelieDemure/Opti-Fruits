@@ -111,11 +111,9 @@ def inscription():
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
             profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        else : 
-            filename = "Profil1.png"
-        connection = sqlite3.connect('bd4.db')
+        connection = sqlite3.connect('bd3.db')
         try : 
-            connection = sqlite3.connect('bd4.db')
+            connection = sqlite3.connect('bd3.db')
             connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
         except sqlite3.IntegrityError : 
             return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
@@ -209,7 +207,7 @@ def recherche():
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
         else:
             if codePostal:
-                propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? ORDER BY ville", codePostal)
+                propositions = db.execute("SELECT * FROM proposition WHERE codepostal=?", codePostal)
                 if not session.get("name"):
                     navbar='unconnectedLayout'
                     return render_template("recherchecp.html",navbar=navbar,propositions=propositions)
@@ -217,6 +215,20 @@ def recherche():
                     navbar='connectedLayout'
                     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
                     return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions)
+            if departement:
+                key_dep = list(DEPARTEMENTS.keys())
+                val_dep = list(DEPARTEMENTS.values())
+                dep = key_dep[val_dep.index(departement)]
+                propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ?", str(dep) + "%")
+                if not session.get("name"):
+                    navbar='unconnectedLayout'
+                    return render_template("recherchecp.html",navbar=navbar,propositions=propositions,dep=dep)
+                else:
+                    navbar='connectedLayout'
+                    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                    return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
+
+
 
 @app.route('/TODO')
 def todo():
