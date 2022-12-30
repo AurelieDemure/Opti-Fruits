@@ -66,7 +66,7 @@ def connexion():
         if password2 == password:
             session["name"]=mail
             profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-            return redirect('/profil/'+profil[0]["pseudo"])
+            return redirect('/profil/'+mail)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
@@ -110,7 +110,7 @@ def inscription():
         # return redirect('/profil/'+mail)
         connection.close()
         session["name"]=mail
-        return redirect('/profil/'+str(pseudo))
+        return redirect('/profil/'+mail)
 
 @app.route('/map')
 def map():
