@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, redirect, session
 from werkzeug.utils import secure_filename
 from flask_session import Session
 
-db= SQL('sqlite:///bd3.db')
+db= SQL('sqlite:///bd4.db')
 
 UPLOAD_FOLDER='./static/proposePictures'
 ALLOWED_EXTENSIONS={'png','jpg','jpeg'}
@@ -27,13 +27,15 @@ def allowed_file(filename):
 
 @app.route('/')
 def homeDev():
-    if not session.get("name"):
-        navbar='unconnectedLayout'
-        return render_template('TODO.html',navbar=navbar)
-    else:
+    if session.get("name"):
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template('home.html',navbar=navbar,profil=profil)
+        if profil!=[]:
+            return render_template('home.html',navbar=navbar,profil=profil)
+        else:
+            session["name"]=None
+    navbar='unconnectedLayout'
+    return render_template('TODO.html',navbar=navbar)
 
 @app.route('/associations')
 def assos():
@@ -67,7 +69,6 @@ def connexion():
         password2=db.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
         if password2 == password:
             session["name"]=mail
-            profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
             return redirect('/profil/'+mail)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
@@ -165,14 +166,20 @@ def propose():
             return render_template("propose.html",message='veuillez entrer une date de cueillette',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
         if not dateFin:
             return render_template("propose.html",message='veuillez entrer une date de fin',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+        
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        else:
+            filename="no picture"
         maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
         if maxNoProp[0]["maxnoprop"]==None:
             maxNoProp[0]["maxnoprop"]=-1
         noProp=int(maxNoProp[0]["maxnoprop"])+1
-        db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "unknown", noProp, frume, quantite, ville, codePostal, dateCueillette, cueillette, dateFin, description, filename)
+        if frume[-1]=='s':
+            frume=frume[:-1]
+        print (frume)
+        db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", profil[0]["pseudo"], noProp, frume.upper(), quantite, ville.upper(), codePostal, dateCueillette, cueillette, dateFin, description, filename)
         #return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
         proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
         return render_template("proposition.html", proposition=proposition,navbar=navbar,profil=profil)
