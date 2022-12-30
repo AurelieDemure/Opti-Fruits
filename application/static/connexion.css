@@ -7,21 +7,29 @@
     margin-top: 10%;
 }
 
+.form{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
 .Text{
     color: black;
-    size-adjust: 5%;
     text-align: center;
+    padding: 5px;
 }
 
 #Email {
     border-color: black;
     text-align: center;
     max-width: 30%;
-    align-self: center;
     display: block;
     margin-left: auto;
     margin-top: auto;
     margin-right: auto;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 10px;
 }
 
 .mdp{
@@ -29,11 +37,12 @@
     border-color: black;
     text-align: center;
     max-width: 30%;
-    align-self: center;
     display: block;
     margin-left: auto;
     margin-top: auto;
     margin-right: auto;
+    padding: 5px;
+    border-radius: 10px;
 }
 
 
