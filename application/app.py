@@ -27,15 +27,16 @@ def allowed_file(filename):
 
 @app.route('/')
 def homeDev():
+    propositions=db.execute("SELECT * FROM proposition")
     if session.get("name"):
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
         if profil!=[]:
-            return render_template('home.html',navbar=navbar,profil=profil)
+            return render_template('home.html',navbar=navbar,profil=profil,propositions=propositions)
         else:
             session["name"]=None
     navbar='unconnectedLayout'
-    return render_template('TODO.html',navbar=navbar)
+    return render_template('home.html',navbar=navbar, propositions=propositions)
 
 @app.route('/associations')
 def assos():
@@ -122,6 +123,11 @@ def inscription():
         connection.close()
         session["name"]=mail
         return redirect('/profil/'+mail)
+
+@app.route('/logout')
+def logout():
+    session['name']=None
+    return redirect('/')
 
 @app.route('/profil/<string:mail>')
 def profil(mail:str):

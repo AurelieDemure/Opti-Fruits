@@ -1,0 +1,36 @@
+.fluxdiv{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 25px;
+    align-items: centre;
+}
+
+.img{
+    
+    width: 180px;
+    height: 180px;
+    left: calc(50% - 180px/2 + 260px);
+    border-radius: 10px;
+}
+.propose{
+    width: 740px;
+    height: 220px;
+    background-color: var(--dark-pink);
+    align-items: centre;
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.propimg{
+        width: 100px
+}
+
+.space{
+    display: flex;
+    justify-content: space-around;
+}
+
+.textprop{
+    font-size: 25px;
+}

@@ -1,14 +1,6 @@
-.divcolumn{
-    flex-direction: column;
-}
-
 .divprop{
     flex-wrap: wrap;
     padding:5px;
-}
-
-.divrow{
-    flex-direction: row;
 }
 
 .error{

@@ -14,6 +14,16 @@ body {
     box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
 }
 
+.divcolumn{
+    display: flex;
+    flex-direction: column;
+}
+
+.divrow{
+    display: flex;
+    flex-direction: row;
+}
+
 .icon {
     width: 50px;
     fill: var(--dark-green);
@@ -40,4 +50,9 @@ nav {
     background-color: var(--light-pink);
     height: 5%;
     box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.wrap{
+    display: flex;
+    flex-wrap: wrap;
 }

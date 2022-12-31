@@ -1,6 +1,27 @@
 {%extends navbar+".html"%}
 
 {%block body%}
-    <h1>Home</h1>
-    <a href="/propose">Je propose</a>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
+
+    <div class="fluxdiv space">
+        {%if propositions==[]%}
+            <div class="text textprop">
+                Pas de proposition actuellement disponible :/
+            </div>
+        {%else%}
+            {%for proposition in propositions%}
+                <div class="propose divrow space">
+                    <div class="divcolumn space">
+                        <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                        <p class="text space">{{proposition.pseudo}}</p>
+                    </div>
+                    <p class="text">{{proposition.description}}</p>
+                    <img class="img" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
+                </div>
+            {%endfor%}
+        {%endif%}
+    </div>
+    {%if profil%}
+        <a href="/propose">Je propose</a>
+    {%endif%}
 {%endblock%}
