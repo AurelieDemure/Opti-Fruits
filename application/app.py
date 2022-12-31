@@ -89,7 +89,7 @@ def inscription():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
         mention = request.form.get("mention")
-        profilphoto=request.form.get("profilphoto")
+        profilphoto=request.files['profilphoto']
         if not nom :
             return render_template("inscription.html", message='Veuillez renseigner votre nom', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if not prenom :
@@ -111,9 +111,9 @@ def inscription():
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
             profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        connection = sqlite3.connect('bd3.db')
+        connection = sqlite3.connect('bd4.db')
         try : 
-            connection = sqlite3.connect('bd3.db')
+            connection = sqlite3.connect('bd4.db')
             connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
         except sqlite3.IntegrityError : 
             return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)

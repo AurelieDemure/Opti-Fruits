@@ -1,9 +1,6 @@
 .page {
     display: block;
-    flex-direction: column;
     column-count: 3;
-    align-content: center;
-    justify-content: space-between;
     margin-left: 10%;
     width: 100%;
     margin-top: 10%;
@@ -11,7 +8,6 @@
 
 .Identité {
     display: block;
-    flex-direction: row;
     align-self: center;
     align-content: center;
     width: fit-content;
@@ -21,7 +17,6 @@
 
 .Contact {
     display: block;
-    flex-direction: row;
     align-self: center;
     align-content: center;
     margin-bottom: 300px;
@@ -29,7 +24,6 @@
 
 .Autres {
     display: block;
-    flex-direction: row;
     align-self: center;
     margin-bottom: 30px;
 }
