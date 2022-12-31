@@ -26,8 +26,14 @@
                 <input class="input" name="confirm_password" type="password" placeholder="ex : opti_mireille12" value={{confirm_password}}>
                 <div class="Text">Mentions :</div>
                 <input class="input" name="mention" placeholder="ex : horaires de disponibilité, passions..." value={{mention}}>
-                <div class="Text">Photo de profil : (format png, jpg ou jpeg uniquement)</div>
-                <input class="input" name="profilphoto" type="file" value={{profilphoto}} alt="static/images/Profil1.png">
+                <p>
+                   <!-- <input type="checkbox" class="choix photo" name="choix photo" value="profilphoto"> -->
+                    <div class="Text">Photo de profil : </div>
+                    <input class="input" name="profilphoto" type="file" value={{profilphoto}} accept="image/x-png,image/jpg,image/jpeg">
+                    <!-- <input type="checkbox" class="choix photo" name="choix photo" value="defaultphoto">
+                    <div class="Text">Photo par défault :</div>
+                    <img class="defaultphoto" name="defaultphoto" src={{url_for('static', filename="Profil1.png")}}> -->
+                </p>
             </div> 
             <div class="erreur">{{message}}</div>
             <input class="inscription" type="submit" value="VALIDER">             
