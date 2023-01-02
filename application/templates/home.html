@@ -2,26 +2,29 @@
 
 {%block body%}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
-
-    <div class="fluxdiv space">
-        {%if propositions==[]%}
-            <div class="text textprop">
-                Pas de proposition actuellement disponible :/
-            </div>
-        {%else%}
-            {%for proposition in propositions%}
-                <div class="propose divrow space">
-                    <div class="divcolumn space">
-                        <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
-                        <p class="text space">{{proposition.pseudo}}</p>
-                    </div>
-                    <p class="text">{{proposition.description}}</p>
-                    <img class="img" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
+    <div class="divrow space fluxdiv">
+        <div class="fluxdiv space divcolumn space">
+            {%if propositions==[]%}
+                <div class="text textprop">
+                    Pas de proposition actuellement disponible :/
                 </div>
-            {%endfor%}
-        {%endif%}
+            {%else%}
+                {%for proposition in propositions%}
+                    <a href="/proposition/{{proposition.noprop}}">
+                        <div class="propose divrow space">
+                            <div class="divcolumn">
+                                <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                                <p class="text space pseudo">{{proposition.pseudo}}</p>
+                            </div>
+                            <p class="text textprop">{{proposition.description}}</p>
+                            <img class="img" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
+                        </div>
+                    </a>
+                {%endfor%}
+            {%endif%}
+        </div>
+        <div>
+            <a class="jepropose text" href="/propose/-1">Je propose</a>
+        </div>
     </div>
-    {%if profil%}
-        <a href="/propose">Je propose</a>
-    {%endif%}
 {%endblock%}

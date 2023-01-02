@@ -24,6 +24,15 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+dbfrumes=db.execute("SELECT nomfrumes FROM frumes")
+frumes=[]
+for dbfrume in dbfrumes:
+    frumes.append(dbfrume['nomfrumes'])
+
+dbvilles=db.execute("SELECT nom_commune_postal FROM lieux")
+villes=[]
+for dbville in dbvilles:
+    villes.append(dbville['nom_commune_postal'])
 
 @app.route('/')
 def homeDev():
@@ -145,52 +154,77 @@ def profil(mail:str):
 
 
 
-@app.route('/propose',methods=['GET','POST'])
-def propose():
+@app.route('/propose/<int:id>',methods=['GET','POST'])
+def propose(id:int):
     if not session.get("name"):
         return redirect("/connexion")
     navbar='connectedLayout'
     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-    if request.method=='GET':
-        return render_template("propose.html",message='',navbar=navbar,profil=profil)
-    if request.method=='POST':
-        frume=request.form.get("frume")
-        quantite=request.form.get("quantite")
-        codePostal=request.form.get("codePostal")
-        ville=request.form.get("ville")
-        dateCueillette=request.form.get("dateCueillette")
-        dateFin=request.form.get("dateFin")
-        cueillette=request.form.get("cueillette")
-        description=request.form.get("description")
-        photo=request.files['photo']
-        if not frume:
-            return render_template("propose.html",message='veuillez entrer un fruit ou légume',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
-        if not quantite:
-            return render_template("propose.html",message='veuillez entrer une quantité',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
-        if not codePostal:
-            return render_template("propose.html",message='veuillez entrer un code postal',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
-        if not ville:
-            return render_template("propose.html",message='veuillez entrez une ville',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
-        if not dateCueillette:
-            return render_template("propose.html",message='veuillez entrer une date de cueillette',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
-        if not dateFin:
-            return render_template("propose.html",message='veuillez entrer une date de fin',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
-        
-        if photo and allowed_file(photo.filename):
-            filename = secure_filename(photo.filename)
-            photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        else:
-            filename="no picture"
-        maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
-        if maxNoProp[0]["maxnoprop"]==None:
-            maxNoProp[0]["maxnoprop"]=-1
-        noProp=int(maxNoProp[0]["maxnoprop"])+1
-        if frume[-1]=='s':
-            frume=frume[:-1]
-        print (frume)
-        db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", profil[0]["pseudo"], noProp, frume.upper(), quantite, ville.upper(), codePostal, dateCueillette, cueillette, dateFin, description, filename)
-        #return render_template("proposition.html",frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette, dateFin=dateFin,cueillette=cueillette,description=description, photo=photo.filename)
-        proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
+    if id==-1:
+        if request.method=='GET':
+            return render_template("propose.html",message='',navbar=navbar,profil=profil)
+        if request.method=='POST':
+            frume=request.form.get("frume")
+            quantite=request.form.get("quantite")
+            codePostal=request.form.get("codePostal")
+            ville=request.form.get("ville")
+            dateCueillette=request.form.get("dateCueillette")
+            dateFin=request.form.get("dateFin")
+            cueillette=request.form.get("cueillette")
+            description=request.form.get("description")
+            photo=request.files['photo']
+            if not frume:
+                return render_template("propose.html",message='Veuillez entrer un fruit ou légume.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            upperfrume=frume.upper()
+            if upperfrume[-1]=='S':
+                upperfrume=upperfrume[:-1]
+            if not upperfrume in frumes:
+                return render_template("propose.html",message='Fruit ou légume inconnu.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            if not quantite:
+                return render_template("propose.html",message='Veuillez entrer une quantité.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            if not codePostal:
+                return render_template("propose.html",message='Veuillez entrer un code postal.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            if not ville:
+                return render_template("propose.html",message='Veuillez entrez une ville.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            upperville=ville.upper()
+            if not upperville in villes:
+                return render_template("propose.html",message='Ville inconnu.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            dbcps=db.execute("SELECT code_postal FROM lieux WHERE nom_commune_postal=?",upperville)
+            cps=[]
+            for dbcp in dbcps:
+                cps.append(dbcp['code_postal'])
+            if not int(codePostal) in cps:
+                return render_template("propose.html",message='Ville ou code postal incorrecte.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            if not dateCueillette:
+                return render_template("propose.html",message='Veuillez entrer une date de cueillette.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            if not dateFin:
+                return render_template("propose.html",message='Veuillez entrer une date de fin.',frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+            if photo and allowed_file(photo.filename):
+                filename = secure_filename(photo.filename)
+                photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            else:
+                filename="no picture"
+            maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
+            if maxNoProp[0]["maxnoprop"]==None:
+                maxNoProp[0]["maxnoprop"]=-1
+            noProp=int(maxNoProp[0]["maxnoprop"])+1
+            db.execute("INSERT INTO proposition (pseudo, noprop, nomfrumes, quantite, ville, codepostal, datecueillette, cueillette, dateexpiration, description, propositionphoto) VALUES(?,?,?,?,?,?,?,?,?,?,?)", profil[0]["pseudo"], noProp, upperfrume, quantite, upperville, codePostal, dateCueillette, cueillette, dateFin, description, filename)
+            return redirect ('/proposition/'+str(noProp))
+    else:
+        proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",id)
+        return redirect("/TODO")
+        #return render_template("propose.html",message='',frume=proposition[0]["frume"],quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,navbar=navbar,profil=profil)
+
+
+@app.route("/proposition/<int:noProp>")
+def proposition(noProp:int):
+    proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
+    if not session.get("name"):
+        navbar='unconnectedLayout'
+        return render_template("proposition.html", proposition=proposition,navbar=navbar)
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
         return render_template("proposition.html", proposition=proposition,navbar=navbar,profil=profil)
 
 @app.route('/recherche', methods=['GET','POST'])
@@ -237,7 +271,14 @@ def recherche():
                     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
                     return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
 
-
+@app.route('/supprPropose/<int:id>')
+def supprPropose(id:int):
+    if not session.get("name"):
+        redirect('/')
+    else:
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        db.execute("DELETE FROM proposition WHERE noprop=?",id)
+        return render_template('supprProp.html',profil=profil)
 
 @app.route('/TODO')
 def todo():
