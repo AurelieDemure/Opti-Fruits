@@ -1,28 +1,48 @@
 {% extends navbar+".html" %}
 {% block body %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='recherche.css')}}">
 
     <h1>Recherche</h1>
 
-    <span>Veuillez renseignez votre code postal ou votre département</span>
+    <div class="page">
+        <span>Veuillez renseignez votre code postal ou votre département</span>
+        <div class="form block">
+            <form action="/recherche" method="post">
+                <input autocomplete="off" autofocus name="Code Postal" placeholder="Code Postal" type="text">
+                <input type="submit" value="Valider">
+            </form>
 
-    <div class="form">
-        <form action="/recherche" method="post">
-            <input autocomplete="off" autofocus name="Code Postal" placeholder="Code Postal" type="text">
-            <input type="submit" value="Valider">
-        </form>
-
-        <form action="/recherche" method="post">
-            <select name="Départements">
-                <option disabled selected value="">Département</option>
-                {% for departement in departements %}
-                    <option value="{{ departements[departement] }}">{{ departements[departement] }}</option>
-                {% endfor %}
-            <input type="submit" value="Valider">
-        </form>
+            <form action="/recherche" method="post">
+                <select name="Départements">
+                    <option disabled selected value="">Département</option>
+                    {% for departement in departements %}
+                        <option value="{{ departements[departement] }}">{{ departements[departement] }}</option>
+                    {% endfor %}
+                <input type="submit" value="Valider">
+            </form>
+            <div class="error message">
+                <p class='message'>{{message}}</p>
+            </div>
+        </div>
+        
+        <div class="carte block">
+            <span>Vous pouvez également choisir une région</span>
+            <img class="img" src="/static/images/carte_region_scrop.jpg" alt="carte des régions" usemap="#c">
+            <map name="c">
+                <area alt="Grand Est" title="Grand Est" href="" coords="1562,512,2054,701" shape="rect">
+                <area alt="Hauts-de-France" title="Hauts-de-France" href="" coords="1462,429,1227,218" shape="rect">
+                <area alt="Normandie" title="Normandie" href="" coords="762,445,1056,593" shape="rect">
+                <area alt="Ile-de-France" title="Ile-de-France" href="https://www.google.fr/maps/preview" coords="1167,512,1401,670" shape="rect">
+                <area alt="Bretagne" title="Bretagne" href="" coords="233,606,608,774" shape="rect">
+                <area alt="Pays de la Loire" title="Pays de la Loire" href="" coords="571,844,869,961" shape="rect">
+                <area alt="Centre-Val de Loire" title="Centre-Val de Loire" href="" coords="1060,767,1308,1062" shape="rect">
+                <area alt="Bourgogne-Franche-Comté" title="Bourgogne-Franche-Comté" href="" coords="1428,827,1917,1055" shape="rect">
+                <area alt="Nouvelle-Aquitaine" title="Nouvelle-Aquitaine" href="" coords="675,1236,1197,1467" shape="rect">
+                <area alt="Auvergne-Rhöne-Alpes" title="Auvergne-Rhöne-Alpes" href="" coords="1321,1185,2007,1457" shape="rect">
+                <area alt="Occitanie" title="Occitanie" href="" coords="922,1681,1539,2039" shape="rect">
+                <area alt="Provence-Alpes-Côtes d'Azur" title="Provence-Alpes-Côtes d'Azur" href="" coords="1726,1634,2118,1909" shape="rect">
+                <area alt="Corse" title="Corse" href="" coords="2168,1915,2329,2187" shape="rect">
+            </map>
+        </div>
     </div>
-    <div class="error message">
-        <p class='message'>{{message}}</p>
-    </div>
-
-
 {%endblock%}
