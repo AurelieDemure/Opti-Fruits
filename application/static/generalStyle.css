@@ -41,6 +41,10 @@ body {
     width:200px;
 }
 
+.pseudo{
+    font-size: 25px;
+    margin:0px;
+}
 nav { 
     display: flex;
     flex-direction: row;

@@ -1,4 +1,4 @@
-{%extends "connectedLayout.html"%}
+{%extends navbar+".html"%}
 
 {%block body%}
 
@@ -13,5 +13,9 @@
     <h1>Photo : 
         <img src={{url_for('static', filename="proposePictures/"+proposition[0]["propositionphoto"])}} alt="no picture"/>
     </h1>
+    {%if session.get("name") and proposition[0]["pseudo"]==profil[0]["pseudo"]%}
+        <a href="/propose/{{proposition[0]["noprop"]}}">Modifier la proposition</a>
+        <a href="/supprPropose/{{proposition[0]["noprop"]}}">Supprimer la proposition</a>
+    {%endif%}
 
 {%endblock%}
