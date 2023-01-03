@@ -73,3 +73,7 @@ nav {
     display: flex;
     flex-wrap: wrap;
 }
+
+.personne {
+    text-decoration:none;
+}

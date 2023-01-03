@@ -30,6 +30,7 @@
 }
 
 .jepropose{
+    text-decoration:none;
     background-color: var(--light-pink);
     border-radius: 30px;
     padding: 20px;
@@ -43,4 +44,8 @@
     font-size: 25px;
     width: 359px;
     height: 120px;
+}
+
+.proposition {
+    text-decoration: none;
 }

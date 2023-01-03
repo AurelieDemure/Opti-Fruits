@@ -8,6 +8,9 @@
 </form>
 
 <div class="associations">
+        {%if assos==[]%}
+            <p class="message">Aucun résultat</p>
+        {%endif%}
         {%for asso in assos%}
             <div class="asso">
                 <p>{{asso.nom}}</p>

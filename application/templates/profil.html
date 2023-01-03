@@ -4,12 +4,17 @@
 
 {%for user in utilisateur%}
     <div class="informations_utilisateur">
-        <img class="photo_profil" src="{{ url_for('static', filename=photo_profil)}}">
-        <p class="nom">{{user.prenom}} {{user.nom}}</p>
-        <p class="pseudo">{{user.pseudo}}</p>
-        <p class="mention">{{user.mention}}</p>
+        <div>
+            <img class="photo_profil" src="{{ url_for('static', filename=photo_profil)}}">
+            <p class="mention">{{user.mention}}</p>
+        </div>
+        <div class="infos">
+            <p class="nom">{{user.prenom}} {{user.nom}}</p>
+            <p class="pseudo">{{user.pseudo}}</p>
+        </div>
     </div>
 {%endfor%}
+
 
 <a href="/logout">Se déconnecter</a>
 
