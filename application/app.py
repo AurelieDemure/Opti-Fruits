@@ -248,7 +248,7 @@ def recherche():
                 navbar='connectedLayout'
                 profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
-        else:
+        elif codePostal or departement:
             if codePostal:
                 propositions = db.execute("SELECT * FROM proposition WHERE codepostal=?", codePostal)
                 if not session.get("name"):
@@ -270,6 +270,9 @@ def recherche():
                     navbar='connectedLayout'
                     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
                     return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
+        else: 
+            return render_template("home.html")
+            
 
 @app.route('/supprPropose/<int:id>')
 def supprPropose(id:int):
