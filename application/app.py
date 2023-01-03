@@ -143,14 +143,20 @@ def logout():
 
 @app.route('/profil/<string:mail>')
 def profil(mail:str):
-    utilisateur=db.execute("SELECT * FROM utilisateur WHERE mail=?",mail)
+    utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE mail=?",mail)
     propositions=db.execute("SELECT * FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE u.mail=?",mail)            
+    photo_profil=db.execute("SELECT profilphoto FROM utilisateur WHERE mail=?",mail)
+    if photo_profil==[{'profilphoto': None}]:
+        photo_profil='profilPicture/Default.png'
+    else:
+        for photoprofil in photo_profil:
+            photo_profil='proposePictures/'+str(photoprofil['profilphoto'])
     if session.get("name"):
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template("profil.html",utilisateur=utilisateur,propositions=propositions,navbar=navbar,profil=profil)
+        return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar,profil=profil)
     navbar='unconnectedLayout'
-    return render_template("profil.html",utilisateur=utilisateur,propositions=propositions,navbar=navbar)
+    return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar)
 
 
 
