@@ -13,7 +13,11 @@
                     <a href="/proposition/{{proposition.noprop}}">
                         <div class="propose divrow space">
                             <div class="divcolumn">
-                                <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                                {%if not proposition.profilphoto%}
+                                    <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                                {%else%}
+                                    <img class="photo_profil" src="{{ url_for('static', filename='proposePictures/'+proposition["profilphoto"])}}">
+                                {%endif%}
                                 <p class="text space pseudo">{{proposition.pseudo}}</p>
                             </div>
                             <p class="text textprop">{{proposition.description}}</p>
