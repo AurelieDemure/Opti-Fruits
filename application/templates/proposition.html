@@ -1,21 +1,74 @@
 {%extends navbar+".html"%}
 
 {%block body%}
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='proposition.css')}}">
 
-    <h1>Frume : {{proposition[0]["nomfrumes"]}}</h1>
-    <h1>Quantité : {{proposition[0]["quantite"]}} kg</h1>
-    <h1>Code Postal : {{proposition[0]["codepostal"]}}</h1>
-    <h1>Ville : {{proposition[0]["ville"]}}</h1>
-    <h1>Date de Cueillette : {{proposition[0]["datecueillette"]}}</h1>
-    <h1>Date de fin : {{proposition[0]["dateexpiration"]}}</h1>
-    <h1>Cueillette : {{proposition[0]["cueillette"]}}</h1>
-    <h1>Description : {{proposition[0]["description"]}}</h1>
-    <h1>Photo : 
-        <img src={{url_for('static', filename="proposePictures/"+proposition[0]["propositionphoto"])}} alt="no picture"/>
-    </h1>
-    {%if session.get("name") and proposition[0]["pseudo"]==profil[0]["pseudo"]%}
-        <a href="/propose/{{proposition[0]["noprop"]}}">Modifier la proposition</a>
-        <a href="/supprPropose/{{proposition[0]["noprop"]}}">Supprimer la proposition</a>
-    {%endif%}
+<div class="divprop centre space">
+    <div class="divprop divcolumn propose centre">
+        <div class="divprop divrow space centre">
+            <div class="divprop divcolumn centre">
+                <a href="/profil/{{proposant[0]["mail"]}}">
+                    <div class="divcolumn">
+                        <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                        <p class="text space pseudo">{{proposition[0]["pseudo"]}}</p>
+                    </div>
+                </a>
+                <div class="divprop divcolumn centre">
+                    <div class="divprop text textprop">Fruits / Légumes proposé :</div>
+                    <div class="divprop textprop">{{proposition[0]["nomfrumes"]}}</div>
+                </div>
+                <div class="divprop divcolumn centre">
+                    <div class="divprop text textprop">Quantité du produit :</div>
+                    <div class="divprop textprop">{{proposition[0]["quantite"]}} kg</div>
+                </div>
+                <div class="divprop divrow flex centre">
+                    <div class="divprop divcolumn centre">
+                        <div class="divprop text textprop">Code postal :</div>
+                        <div class="divprop textprop">{{proposition[0]["codepostal"]}}</div>
+                    </div>
+                    <div class="divprop divcolumn centre">
+                        <div class="divprop text textprop">Ville :</div>
+                        <div class="divprop textprop">{{proposition[0]["ville"]}}</div>
+                    </div>
+                </div>
+                <div class="divprop divcolumn centre">
+                    <div class="divprop text textprop">Description :</div>
+                    <div class="divprop textprop">{{proposition[0]["description"]}}</div>
+                </div>
+            </div>
+            <div class="divprop divcolumn centre">
+                <div class="divprop divcolumn centre">
+                    <div class="divprop text textprop">Date de la cueillette :</div>
+                    <div class="divprop textprop">{{proposition[0]["datecueillette"]}}</div>
+                </div>
+                <div class="divprop divcolumn centre">
+                    <div class="divprop text textprop">Date d'expiration de la demande :</div>
+                    <div class="divprop textprop">{{proposition[0]["dateexpiration"]}}</div>
+                </div>
+                <div class="divprop divrow flex centre">
+                    {%if proposition[0]["cueillette"]=="Oui" %}
+                        <div class="divprop textprop">
+                            Les produits sont à cueillir.
+                        </div>
+                    {%else%}
+                    <div class="divprop textprop">
+                        Les produits sont déja cueillis.
+                    </div>
+                    {%endif%}
+                </div>
+                <div class="divprop divcolumn centre">
+                    <div class="divprop text textprop">Photo :</div> 
+                    <img class="img" src={{url_for('static', filename="proposePictures/"+proposition[0]["propositionphoto"])}} alt="no picture"/>
+                </div>
+            </div>
+        </div>
+        <div class="divprop divrow space centre">
+            {%if session.get("name") and proposition[0]["pseudo"]==profil[0]["pseudo"]%}
+                <a class="buttonpink" href="/supprPropose/{{proposition[0]["noprop"]}}">Supprimer la proposition</a>
+            {%endif%}
+            <a class="buttongreen" href="/">Home</a>
+        </div>
+    </div>
+</div>
 
 {%endblock%}
