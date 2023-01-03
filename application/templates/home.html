@@ -14,14 +14,14 @@
                         <div class="propose divrow space">
                             <div class="divcolumn">
                                 {%if not proposition.profilphoto%}
-                                    <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                                    <img class="propimg" src="{{ url_for('static', filename='images/Default.png')}}">
                                 {%else%}
-                                    <img class="propimg" src="{{ url_for('static', filename='proposePictures/'+proposition["profilphoto"])}}">
+                                    <img class="propimg" src="{{ url_for('static', filename='downloadPictures/'+proposition["profilphoto"])}}">
                                 {%endif%}
                                 <p class="text space pseudo">{{proposition.pseudo}}</p>
                             </div>
                             <p class="text textprop">{{proposition.description}}</p>
-                            <img class="img" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
+                            <img class="img" src="{{ url_for('static', filename='downloadPictures/'+proposition["propositionphoto"])}}">
                         </div>
                     </a>
                 {%endfor%}

@@ -7,7 +7,7 @@ from flask_session import Session
 
 db= SQL('sqlite:///bd4.db')
 
-UPLOAD_FOLDER='./static/proposePictures'
+UPLOAD_FOLDER='./static/downloadPictures'
 ALLOWED_EXTENSIONS={'png','jpg','jpeg'}
 
 app=Flask(__name__,
@@ -147,10 +147,10 @@ def profil(mail:str):
     propositions=db.execute("SELECT * FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE u.mail=?",mail)            
     photo_profil=db.execute("SELECT profilphoto FROM utilisateur WHERE mail=?",mail)
     if photo_profil==[{'profilphoto': None}]:
-        photo_profil='profilPicture/Default.png'
+        photo_profil='images/Default.png'
     else:
         for photoprofil in photo_profil:
-            photo_profil='proposePictures/'+str(photoprofil['profilphoto'])
+            photo_profil='downloadPictures/'+str(photoprofil['profilphoto'])
     if session.get("name"):
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
@@ -218,15 +218,14 @@ def propose():
 
 @app.route("/proposition/<int:noProp>")
 def proposition(noProp:int):
-    proposition=db.execute("SELECT * FROM proposition WHERE noprop=?",noProp)
-    proposant=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",proposition[0]["pseudo"])
+    proposition=db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE noprop=?",noProp)
     if not session.get("name"):
         navbar='unconnectedLayout'
-        return render_template("proposition.html", proposition=proposition,proposant=proposant,navbar=navbar)
+        return render_template("proposition.html", proposition=proposition,navbar=navbar)
     else:
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template("proposition.html", proposition=proposition,proposant=proposant,navbar=navbar,profil=profil)
+        return render_template("proposition.html", proposition=proposition,navbar=navbar,profil=profil)
 
 @app.route('/recherche', methods=['GET','POST'])
 def recherche():
