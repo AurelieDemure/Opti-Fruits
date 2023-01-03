@@ -2,9 +2,16 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    min-width: 50%;
     align-self: center;
     margin-top: 10%;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-bottom: 10%;
+    padding-top: 5%;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 5%;
+    background-color: var(--light-green);
 }
 
 .form{
@@ -22,27 +29,25 @@
 #Email {
     border-color: black;
     text-align: center;
-    max-width: 30%;
-    display: block;
     margin-left: auto;
     margin-top: auto;
     margin-right: auto;
     padding: 5px;
     margin-bottom: 10px;
     border-radius: 10px;
+    background-color: white;
 }
 
 .mdp{
     color: black;
     border-color: black;
     text-align: center;
-    max-width: 30%;
-    display: block;
     margin-left: auto;
     margin-top: auto;
     margin-right: auto;
     padding: 5px;
     border-radius: 10px;
+    background-color: white;
 }
 
 
