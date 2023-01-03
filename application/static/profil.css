@@ -12,9 +12,23 @@
 
 .nom {
     color:var(--dark-pink);
+    padding-left: 300px;
+    padding-top:10px;
+}
+
+.pseudo {
+    margin-left:200px;
 }
 
 .mention {
     color:grey;
     padding-top: 5em;
+}
+
+.photo_profil {
+    position: left;
+    width: 180px;
+    height: 180px;
+    left: calc(50% - 180px/2 + 260px);
+    border-radius: 10px;
 }
