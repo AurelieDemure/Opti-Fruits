@@ -36,7 +36,7 @@ for dbville in dbvilles:
 
 @app.route('/')
 def homeDev():
-    propositions=db.execute("SELECT * FROM proposition")
+    propositions=db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo")
     if session.get("name"):
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
