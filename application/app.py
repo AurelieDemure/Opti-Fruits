@@ -82,6 +82,7 @@ def connexion():
     if request.method=='POST':
         mail=request.form.get("mail")
         password=request.form.get("password")
+        password=crypte_mdp(password)
         if not mail : 
             return render_template("connexion.html", message="Veuillez renseigner votre adresse mail", password=password)
         if not password : 
@@ -129,6 +130,7 @@ def inscription():
             return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         # if not profilphoto in ALLOWED_EXTENSIONS:
         #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+        password=crypte_mdp(password)
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
             profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -264,7 +266,7 @@ def recherche():
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
         elif codePostal or departement:
             if codePostal:
-                propositions = db.execute("SELECT * FROM proposition WHERE codepostal=?", codePostal)
+                propositions = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal=?", codePostal)
                 if not session.get("name"):
                     navbar='unconnectedLayout'
                     return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions)
@@ -276,7 +278,7 @@ def recherche():
                 key_dep = list(DEPARTEMENTS.keys())
                 val_dep = list(DEPARTEMENTS.values())
                 dep = key_dep[val_dep.index(departement)]
-                propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ?", str(dep) + "%")
+                propositions = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ?", str(dep) + "%")
                 if not session.get("name"):
                     navbar='unconnectedLayout'
                     return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions,dep=dep)
@@ -287,19 +289,19 @@ def recherche():
 
 @app.route('/recherche/<string:region>')
 def rechercheregion(region:str): 
-    propositions1 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(1)+ "%", "%"+ str(3)+ "%", "%"+ str(7)+ "%", str(15)+ "%", str(26)+ "%", str(38)+ "%", str(42)+ "%", str(43)+ "%", str(63)+ "%", str(69)+ "%", str(73)+ "%", str(74)+ "%")
-    propositions2 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(2)+ "%", str(59)+ "%", str(60)+ "%", str(62)+ "%", str(80)+"%")
-    propositions3 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?  or codepostal LIKE ?", str(14)+ "%", str(27)+ "%", str(50)+ "%", str(61)+ "%", str(76)+ "%")
-    propositions4 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(75)+ "%", str(77)+ "%", str(78)+ "%", str(91)+ "%", str(92)+ "%", str(93)+ "%", str(94)+ "%", str(95)+ "%")
-    propositions5 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(8)+ "%", str(10)+ "%", str(51)+ "%", str(52)+ "%", str(54)+ "%", str(55)+ "%", str(57)+ "%", str(67)+ "%", str(68)+ "%", str(88)+ "%")
-    propositions6 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(35)+ "%", str(22)+ "%", str(56)+ "%", str(29)+ "%")
-    propositions7 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(44)+ "%", str(49)+ "%", str(53)+ "%", str(72)+ "%", str(85)+ "%")
-    propositions8 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(18)+ "%", str(28)+ "%", str(36)+ "%", str(37)+ "%", str(41)+ "%", str(45)+ "%")
-    propositions9 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(21)+ "%", str(25)+ "%", str(39)+ "%", str(58)+ "%", str(70)+ "%", str(71)+ "%", str(89)+ "%", str(90)+ "%")
-    propositions10 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(16)+ "%", str(17)+ "%", str(19)+ "%", str(23)+ "%", str(24)+ "%", str(33)+ "%", str(40)+ "%", str(47)+ "%", str(64)+ "%", str(79)+ "%", str(86)+ "%", str(87)+ "%")
-    propositions11 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(9)+ "%", str(11)+ "%", str(12)+ "%", str(30)+ "%", str(31)+ "%", str(32)+ "%", str(34)+ "%", str(46)+ "%", str(48)+ "%", str(65)+ "%", str(66)+ "%", str(81)+ "%", str(82) + "%")
-    propositions12 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(4)+ "%", "%"+ str(5)+ "%", "%"+ str(6)+ "%", str(13)+ "%", str(83)+ "%", str(84)+ "%")
-    propositions13 = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ?", str(20)+ "%")
+    propositions1 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(1)+ "%", "%"+ str(3)+ "%", "%"+ str(7)+ "%", str(15)+ "%", str(26)+ "%", str(38)+ "%", str(42)+ "%", str(43)+ "%", str(63)+ "%", str(69)+ "%", str(73)+ "%", str(74)+ "%")
+    propositions2 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(2)+ "%", str(59)+ "%", str(60)+ "%", str(62)+ "%", str(80)+"%")
+    propositions3 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?  or codepostal LIKE ?", str(14)+ "%", str(27)+ "%", str(50)+ "%", str(61)+ "%", str(76)+ "%")
+    propositions4 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(75)+ "%", str(77)+ "%", str(78)+ "%", str(91)+ "%", str(92)+ "%", str(93)+ "%", str(94)+ "%", str(95)+ "%")
+    propositions5 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(8)+ "%", str(10)+ "%", str(51)+ "%", str(52)+ "%", str(54)+ "%", str(55)+ "%", str(57)+ "%", str(67)+ "%", str(68)+ "%", str(88)+ "%")
+    propositions6 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(35)+ "%", str(22)+ "%", str(56)+ "%", str(29)+ "%")
+    propositions7 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(44)+ "%", str(49)+ "%", str(53)+ "%", str(72)+ "%", str(85)+ "%")
+    propositions8 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(18)+ "%", str(28)+ "%", str(36)+ "%", str(37)+ "%", str(41)+ "%", str(45)+ "%")
+    propositions9 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(21)+ "%", str(25)+ "%", str(39)+ "%", str(58)+ "%", str(70)+ "%", str(71)+ "%", str(89)+ "%", str(90)+ "%")
+    propositions10 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(16)+ "%", str(17)+ "%", str(19)+ "%", str(23)+ "%", str(24)+ "%", str(33)+ "%", str(40)+ "%", str(47)+ "%", str(64)+ "%", str(79)+ "%", str(86)+ "%", str(87)+ "%")
+    propositions11 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(9)+ "%", str(11)+ "%", str(12)+ "%", str(30)+ "%", str(31)+ "%", str(32)+ "%", str(34)+ "%", str(46)+ "%", str(48)+ "%", str(65)+ "%", str(66)+ "%", str(81)+ "%", str(82) + "%")
+    propositions12 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(4)+ "%", "%"+ str(5)+ "%", "%"+ str(6)+ "%", str(13)+ "%", str(83)+ "%", str(84)+ "%")
+    propositions13 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ?", str(20)+ "%")
     if not session.get("name"):
         navbar='unconnectedLayout'
         if region=="AuvergneRhôneAlpes":
@@ -379,6 +381,21 @@ def todo():
         return render_template("TODO.html",navbar=navbar,profil=profil)
 
 
+def crypte_mdp(mdp):
+    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
+    L=[0]*len(mdp)
+    mdplist=[]
+    for x in mdp:
+        mdplist.append(x)
+    def aux(mdplist,ind_ascii):
+        if len(mdplist)==0:
+            return ''.join(str(n) for n in L)
+        if mdplist[0]!=ascii[ind_ascii]:
+            for i in range(len(L)):
+                L[i]+=1
+            return aux(mdplist,ind_ascii+1)
+        return aux(mdplist[1:],0)
+    return aux (mdplist,0)
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],

@@ -36,7 +36,7 @@
             </div>
             <!--User-->
             <div>
-                <a class="personne" href="/profil/{{profil[0]["mail"]}}">
+                <a class="lien" href="/profil/{{profil[0]["mail"]}}">
                     {%if not profil[0]["profilphoto"]%}
                         <img class="profilimg" src="{{ url_for('static', filename='images/Default.png')}}">
                     {%else%}
