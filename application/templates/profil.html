@@ -1,15 +1,27 @@
-{% extends "connectedLayout.html" %}
+{%extends navbar+".html"%}
 {% block body %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='profil.css')}}">
 
 {%for user in utilisateur%}
     <div class="informations_utilisateur">
+<<<<<<< HEAD
         <img class="photo_profil" src="{{ url_for('static', filename=photo_profil)}}">
         <p class="nom">{{user.prenom}} {{user.nom}}</p>
         <p class="pseudo">{{user.pseudo}}</p>
         <p class="mention">{{user.mention}}</p>
         <img class="photo_perso" src="{{ url_for('static', filename='profilPicture/'+user["profilphoto"])}}"">
+=======
+        <div>
+            <img class="photo_profil" src="{{ url_for('static', filename=photo_profil)}}">
+            <p class="mention">{{user.mention}}</p>
+        </div>
+        <div class="infos">
+            <p class="nom">{{user.prenom}} {{user.nom}}</p>
+            <p class="pseudo">{{user.pseudo}}</p>
+        </div>
+>>>>>>> 89ebd8245e816587db5c8e512735ed0746082322
     </div>
+
 
 
 <a href="/logout">Se déconnecter</a>
@@ -34,11 +46,11 @@
                     <a href="/proposition/{{proposition.noprop}}">
                         <div class="propose divrow space">
                             <div class="divcolumn">
-                                <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                                <img class="propimg" src="{{ url_for('static', filename='images/Default.png')}}">
                                 <p class="text space pseudo">{{proposition.pseudo}}</p>
                             </div>
                             <p class="text textprop">{{proposition.description}}</p>
-                            <img class="img" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
+                            <img class="img" src="{{ url_for('static', filename='downloadPictures/'+proposition["propositionphoto"])}}">
                         </div>
                     </a>
                 {%endfor%}

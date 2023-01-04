@@ -10,25 +10,25 @@
                 </div>
             {%else%}
                 {%for proposition in propositions%}
-                    <a href="/proposition/{{proposition.noprop}}">
+                    <a class="proposition" href="/proposition/{{proposition.noprop}}">
                         <div class="propose divrow space">
                             <div class="divcolumn">
                                 {%if not proposition.profilphoto%}
-                                    <img class="propimg" src="{{ url_for('static', filename='profilPicture/Default.png')}}">
+                                    <img class="propimg" src="{{ url_for('static', filename='images/Default.png')}}">
                                 {%else%}
-                                    <img class="photo_profil" src="{{ url_for('static', filename='proposePictures/'+proposition["profilphoto"])}}">
+                                    <img class="propimg" src="{{ url_for('static', filename='downloadPictures/'+proposition["profilphoto"])}}">
                                 {%endif%}
                                 <p class="text space pseudo">{{proposition.pseudo}}</p>
                             </div>
                             <p class="text textprop">{{proposition.description}}</p>
-                            <img class="img" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
+                            <img class="img" src="{{ url_for('static', filename='downloadPictures/'+proposition["propositionphoto"])}}">
                         </div>
                     </a>
                 {%endfor%}
             {%endif%}
         </div>
         <div>
-            <a class="jepropose text" href="/propose/-1">Je propose</a>
+            <a class="jepropose text" href="/propose">Je propose</a>
         </div>
     </div>
 {%endblock%}

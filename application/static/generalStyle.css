@@ -7,7 +7,23 @@ body {
     background-color: var(--cyan);
 }
 
-.connexion{
+.buttongreen{
+    color: var(--cyan);
+    background-color: var(--dark-green);
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.buttonpink{
+    color: var(--dark-green);
+    background-color: var(--light-pink);
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.buttoncyan{
     background-color: var(--cyan);
     border-radius: 20px;
     padding: 10px;
@@ -29,16 +45,14 @@ body {
     fill: var(--dark-green);
 }
 
-.inscription{
-    color: var(--cyan);
-    background-color: var(--dark-green);
-    border-radius: 20px;
-    padding: 10px;
-    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
-}
-
 .logo {
     width:200px;
+}
+
+.profilimg{
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
 }
 
 .pseudo{
@@ -56,7 +70,16 @@ nav {
     box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
 }
 
+.space{
+    display: flex;
+    justify-content: space-around;
+}
+
 .wrap{
     display: flex;
     flex-wrap: wrap;
+}
+
+.personne {
+    text-decoration:none;
 }

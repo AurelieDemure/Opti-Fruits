@@ -16,12 +16,6 @@
                     <img class="logo" alt="Home" src={{url_for('static', filename="images/logo.png")}}/>
                 </a>    
             </div>
-            <!--Notifications-->
-            <div>
-                <a href="/TODO">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 24 24"><path d="M18,13.18V10a6,6,0,0,0-5-5.91V3a1,1,0,0,0-2,0V4.09A6,6,0,0,0,6,10v3.18A3,3,0,0,0,4,16v2a1,1,0,0,0,1,1H8.14a4,4,0,0,0,7.72,0H19a1,1,0,0,0,1-1V16A3,3,0,0,0,18,13.18ZM8,10a4,4,0,0,1,8,0v3H8Zm4,10a2,2,0,0,1-1.72-1h3.44A2,2,0,0,1,12,20Zm6-3H6V16a1,1,0,0,1,1-1H17a1,1,0,0,1,1,1Z"/></svg>                      
-                </a>    
-            </div>
             <!--Messages-->
             <div>
                 <a href="/TODO">
@@ -42,9 +36,13 @@
             </div>
             <!--User-->
             <div>
-                <a href="/profil/{{profil[0]["mail"]}}">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.71,12.71a6,6,0,1,0-7.42,0,10,10,0,0,0-6.22,8.18,1,1,0,0,0,2,.22,8,8,0,0,1,15.9,0,1,1,0,0,0,1,.89h.11a1,1,0,0,0,.88-1.1A10,10,0,0,0,15.71,12.71ZM12,12a4,4,0,1,1,4-4A4,4,0,0,1,12,12Z"/></svg>                     
-                        <h3 class="icon text pseudo">{{profil[0]["pseudo"]}}</h3>
+                <a class="personne" href="/profil/{{profil[0]["mail"]}}">
+                    {%if not profil[0]["profilphoto"]%}
+                        <img class="profilimg" src="{{ url_for('static', filename='images/Default.png')}}">
+                    {%else%}
+                        <img class="profilimg" src="{{ url_for('static', filename='downloadPictures/'+profil[0]["profilphoto"])}}">
+                    {%endif%}
+                    <h3 class="icon text pseudo">{{profil[0]["pseudo"]}}</h3>
                 </a>    
             </div>
         </nav>

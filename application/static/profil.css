@@ -8,16 +8,12 @@
     border-style: solid;
     border-color :var(--dark-pink);
     font-size:1.5em;
+    display:flex;
+    flex-direction:wrap;
 }
 
 .nom {
     color:var(--dark-pink);
-    padding-left: 300px;
-    padding-top:10px;
-}
-
-.pseudo {
-    margin-left:200px;
 }
 
 .mention {
@@ -31,4 +27,8 @@
     height: 180px;
     left: calc(50% - 180px/2 + 260px);
     border-radius: 10px;
+}
+
+.infos {
+    margin-left: 1em;
 }
