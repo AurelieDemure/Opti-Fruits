@@ -8,6 +8,7 @@ body {
 }
 
 .buttongreen{
+    text-decoration:none;
     color: var(--cyan);
     background-color: var(--dark-green);
     border-radius: 20px;
@@ -16,6 +17,7 @@ body {
 }
 
 .buttonpink{
+    text-decoration:none;
     color: var(--dark-green);
     background-color: var(--light-pink);
     border-radius: 20px;
@@ -24,6 +26,7 @@ body {
 }
 
 .buttoncyan{
+    text-decoration:none;
     background-color: var(--cyan);
     border-radius: 20px;
     padding: 10px;

@@ -33,13 +33,31 @@
 
 .jepropose{
     text-decoration:none;
+    width: 128px;
     background-color: var(--light-pink);
     border-radius: 30px;
     padding: 20px;
+    margin:20px;
     font-size: 30px;
     border: 2px solid;
     position: right;
     box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.jerecherche{
+    font-size: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.map{
+    color: var(--dark-green);
+    width: 250px;
+    height: 250px;
+    border: 2px solid;
+    border-radius: 50px;
 }
 
 .textprop{
