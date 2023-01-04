@@ -4,13 +4,6 @@
 
 {%for user in utilisateur%}
     <div class="informations_utilisateur">
-<<<<<<< HEAD
-        <img class="photo_profil" src="{{ url_for('static', filename=photo_profil)}}">
-        <p class="nom">{{user.prenom}} {{user.nom}}</p>
-        <p class="pseudo">{{user.pseudo}}</p>
-        <p class="mention">{{user.mention}}</p>
-        <img class="photo_perso" src="{{ url_for('static', filename='profilPicture/'+user["profilphoto"])}}"">
-=======
         <div>
             <img class="photo_profil" src="{{ url_for('static', filename=photo_profil)}}">
             <p class="mention">{{user.mention}}</p>
@@ -19,26 +12,12 @@
             <p class="nom">{{user.prenom}} {{user.nom}}</p>
             <p class="pseudo">{{user.pseudo}}</p>
         </div>
->>>>>>> 89ebd8245e816587db5c8e512735ed0746082322
     </div>
 
 
 
 <a href="/logout">Se déconnecter</a>
 
-<<<<<<< HEAD
-<div class="propositions">
-    {%for proposition in propositions%}
-        <div class="proposition">
-            <img class="photo_perso" src="{{ url_for('static', filename='profilPicture/'+user["profilphoto"])}}"">
-            <p class="pseudo">{{proposition.pseudo}}</p>
-            <p class="description">{{proposition.description}}</p>
-            <img class="photo_prop" src="{{ url_for('static', filename='proposePictures/'+proposition["propositionphoto"])}}">
-        </div>
-    {%endfor%}
-{%endfor%}
-</div>
-=======
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
     <div class="divrow space fluxdiv">
         <div class="fluxdiv space divcolumn space">
@@ -56,7 +35,6 @@
                 {%endfor%}
         </div>
     </div>
->>>>>>> 38859898d67d40a09e5907d2d8f0f98166dcb226
 
 
 

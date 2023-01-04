@@ -253,11 +253,11 @@ def recherche():
                 propositions = db.execute("SELECT * FROM proposition WHERE codepostal=?", codePostal)
                 if not session.get("name"):
                     navbar='unconnectedLayout'
-                    return render_template("recherchecp.html",navbar=navbar,propositions=propositions)
+                    return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions)
                 else:
                     navbar='connectedLayout'
                     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-                    return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions)
+                    return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions)
             if departement:
                 key_dep = list(DEPARTEMENTS.keys())
                 val_dep = list(DEPARTEMENTS.values())
@@ -265,14 +265,26 @@ def recherche():
                 propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ?", str(dep) + "%")
                 if not session.get("name"):
                     navbar='unconnectedLayout'
-                    return render_template("recherchecp.html",navbar=navbar,propositions=propositions,dep=dep)
+                    return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions,dep=dep)
                 else:
                     navbar='connectedLayout'
                     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-                    return render_template("recherchecp.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
-        else: 
-            return render_template("home.html")
-            
+                    return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
+
+@app.route('/recherche/<string:region>')
+def rechercheregion(region:str): 
+    if not session.get("name"):
+        if region=="GrandEst":
+            propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ?",(str(x)+"%" for x in [50,54]))
+            navbar='unconnectedLayout'
+            return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions)
+    else:
+        if region=="GrandEst":
+            propositions = db.execute("SELECT * FROM proposition WHERE codepostal LIKE ?",(str(x)+"%" for x in [50,54]))
+            navbar='connectedLayout'
+            profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+            return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions)
+
 
 @app.route('/supprPropose/<int:id>')
 def supprPropose(id:int):
@@ -312,7 +324,7 @@ REGIONS = {
     'Nouvelle-Aquitaine': ['16', '17', '19', '23', '24', '33', '40', '47', '64', '79', '86', '87'],
     'Occitanie': ['09', '11', '12', '30', '31', '32', '34', '46', '48', '65', '66', '81', '82'],
     'Pays de la Loire': ['44', '49', '53', '72', '85'],
-    'Provence-Alpes-Côte d\'Azur': ['04', '05', '06', '13', '83', '84'],
+    'Prov²ence-Alpes-Côte d\'Azur': ['04', '05', '06', '13', '83', '84'],
 }
 
 DEPARTEMENTS = {
