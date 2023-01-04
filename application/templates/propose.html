@@ -29,7 +29,12 @@
                         </div>
                         <div class="divprop divcolumn">
                             <div class="divprop">Description :</div>
-                            <textarea class="inputcolor" id="description" name="description" rows="20" cols="50" placeholder="informations, remarques, ..." value={{description}}></textarea>
+                                {%if description[0]==' '%}
+                                <textarea class="inputcolor" id="description" name="description" rows="20" cols="50" placeholder="informations, remarques, ..."></textarea>
+                                {%else%}
+                                    <textarea class="inputcolor" id="description" name="description" rows="20" cols="50" placeholder="informations, remarques, ...">{{description}}</textarea>
+                                {%endif%}
+                            
                         </div>
                     </div>
                     <div class="divprop divcolumn">
@@ -42,13 +47,17 @@
                             <input class="inputcolor" name="dateFin" placeholder="ex : 14/06/2022" value={{dateFin}}>
                         </div>
                         <div class="divprop divrow flex">
-                            <input type="checkbox" id="cueillette" name="cueillette" value="Oui">
+                            {%if not cueillette%}
+                                <input type="checkbox" id="cueillette" name="cueillette" value="Oui">
+                            {%else%}
+                                <input type="checkbox" id="cueillette" name="cueillette" value="Oui" checked>
+                            {%endif%}
                             <div class="divprop">Si les produits ne sont pas cueillis, 
                                 je propose aux personnes de venir les cueillir</div>
                         </div>
                         <div class="divprop divcolumn">
                             <div class="divprop">Photo (png, jpg ou jpeg) (*):</div>
-                            <input type="file" name="photo" accept="image/x-png,image/jpg,image/jpeg">                 
+                            <input type="file" name="photo" accept="image/x-png,image/jpg,image/jpeg" value={{photo}}>                 
                         </div>
                     </div>
                 </div>
