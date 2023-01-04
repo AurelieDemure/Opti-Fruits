@@ -32,3 +32,10 @@
 .infos {
     margin-left: 1em;
 }
+
+.deco{
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}

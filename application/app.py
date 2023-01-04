@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import datetime
 from cs50 import SQL
 from flask import Flask, render_template, request, redirect, session
 from werkzeug.utils import secure_filename
@@ -33,6 +34,16 @@ dbvilles=db.execute("SELECT nom_commune_postal FROM lieux")
 villes=[]
 for dbville in dbvilles:
     villes.append(dbville['nom_commune_postal'])
+
+def pastPropositions():
+    current_time = datetime.datetime.now()
+    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
+    for proposition in dbpropositions:
+        datepropose=proposition["dateexpiration"].split('/')
+        if int(datepropose[2])<current_time.year or int(datepropose[1])<current_time.month or int(datepropose[0])<current_time.day:
+            db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
+
+pastPropositions()
 
 @app.route('/')
 def homeDev():
