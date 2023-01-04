@@ -71,6 +71,7 @@ def connexion():
     if request.method=='POST':
         mail=request.form.get("mail")
         password=request.form.get("password")
+        password=crypte_mdp(password)
         if not mail : 
             return render_template("connexion.html", message="Veuillez renseigner votre adresse mail", password=password)
         if not password : 
@@ -118,6 +119,7 @@ def inscription():
             return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         # if not profilphoto in ALLOWED_EXTENSIONS:
         #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+        password=crypte_mdp(password)
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
             profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -306,6 +308,21 @@ def todo():
         return render_template("TODO.html",navbar=navbar,profil=profil)
 
 
+def crypte_mdp(mdp):
+    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
+    L=[0]*len(mdp)
+    mdplist=[]
+    for x in mdp:
+        mdplist.append(x)
+    def aux(mdplist,ind_ascii):
+        if len(mdplist)==0:
+            return ''.join(str(n) for n in L)
+        if mdplist[0]!=ascii[ind_ascii]:
+            for i in range(len(L)):
+                L[i]+=1
+            return aux(mdplist,ind_ascii+1)
+        return aux(mdplist[1:],0)
+    return aux (mdplist,0)
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],

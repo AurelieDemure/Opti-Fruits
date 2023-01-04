@@ -13,7 +13,7 @@
             <p class="pseudo">{{user.pseudo}}</p>
         </div>
     </div>
-
+{%endfor%}
 
 
 <a href="/logout">Se déconnecter</a>
@@ -25,7 +25,7 @@
                     <a href="/proposition/{{proposition.noprop}}">
                         <div class="propose divrow space">
                             <div class="divcolumn">
-                                <img class="propimg" src="{{ url_for('static', filename='images/Default.png')}}">
+                                <img class="propimg" src="{{ url_for('static', filename=photo_profil)}}">
                                 <p class="text space pseudo">{{proposition.pseudo}}</p>
                             </div>
                             <p class="text textprop">{{proposition.description}}</p>
