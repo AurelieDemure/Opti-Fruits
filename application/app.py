@@ -383,19 +383,23 @@ def todo():
 
 def crypte_mdp(mdp):
     ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
-    L=[0]*len(mdp)
+    mdp_crypte=[0]*len(mdp)
     mdplist=[]
     for x in mdp:
         mdplist.append(x)
-    def aux(mdplist,ind_ascii):
+    def aux(mdplist,ind_ascii,ind_list):
         if len(mdplist)==0:
-            return ''.join(str(n) for n in L)
+            for i in range(len(mdp_crypte)):
+                while mdp_crypte[i]>=len(ascii):
+                    mdp_crypte[i]=mdp_crypte[i]-len(ascii) 
+            return ''.join(ascii[n] for n in mdp_crypte)
         if mdplist[0]!=ascii[ind_ascii]:
-            for i in range(len(L)):
-                L[i]+=1
-            return aux(mdplist,ind_ascii+1)
-        return aux(mdplist[1:],0)
-    return aux (mdplist,0)
+            for i in range(ind_list,len(mdp_crypte)):
+                mdp_crypte[i]+=1
+            return aux(mdplist,ind_ascii+1,ind_list)
+        return aux(mdplist[1:],0,ind_list+1)
+    return aux (mdplist,0,0)
+
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],
