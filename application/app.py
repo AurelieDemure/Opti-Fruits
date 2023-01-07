@@ -154,6 +154,27 @@ def logout():
     session['name']=None
     return redirect('/')
 
+@app.route("/messagerie/<string:pseudo>",methods=['GET','POST'])
+def messagerie(pseudo:str):
+    if not session.get("name"):
+            return redirect('/')
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
+        if pseudo=='None':
+            return redirect('/messagerie/'+recipients[0]['pseudo'])
+        if request.method=='POST':
+            message = request.form.get("message")
+            maxid=db.execute("SELECT max(id) as maxid FROM messagerie")
+            if maxid[0]["maxid"]==None:
+                maxid[0]["maxid"]=0
+            id=int(maxid[0]["maxid"])+1
+            db.execute('INSERT INTO messagerie (id,pseudo_sender,pseudo_recipient,message) VALUES(?,?,?,?)',id,profil[0]['pseudo'],pseudo,message)
+        messages=db.execute("SELECT * FROM messagerie WHERE (pseudo_sender=? and pseudo_recipient=?) or (pseudo_sender=? and pseudo_recipient=?) ORDER BY id",profil[0]['pseudo'],pseudo,pseudo,profil[0]['pseudo'])
+        picture=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
+        return render_template("messagerie.html", pseudo=pseudo,picture=picture,recipients=recipients,messages=messages,navbar=navbar,profil=profil)
+
 @app.route('/profil/<string:mail>')
 def profil(mail:str):
     utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE mail=?",mail)
@@ -195,7 +216,6 @@ def propose():
         cueillette=request.form.get("cueillette")
         description=request.form.get("description")
         photo=request.files['photo']
-        print(description)
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
