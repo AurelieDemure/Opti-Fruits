@@ -320,7 +320,7 @@ def rechercheregion(region:str):
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions7)
         if region=="CentreValdeLoire":
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions8)
-        if region=="BourgogneFranceComté":
+        if region=="BourgogneFrancheComté":
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions9)
         if region=="NouvelleAquitaine":
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions10)
