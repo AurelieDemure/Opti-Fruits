@@ -22,8 +22,14 @@ Session(app)
 
 #pour verifier que le fichier selectionné est bien du bon format
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    n=len(filename)
+    c=0
+    while c<(n-1) and filename[c]!='.':
+        c=c+1
+    if c<n:
+        extension=filename[(c+1):]
+        return(extension in ALLOWED_EXTENSIONS)
+    return(False)
 
 dbfrumes=db.execute("SELECT nomfrumes FROM frumes")
 frumes=[]
@@ -407,19 +413,19 @@ def crypte_mdp(mdp):
     mdplist=[]
     for x in mdp:
         mdplist.append(x)
-    def aux(mdplist,ind_ascii,ind_list):
+    def aux(mdplist,ind_list):
         if len(mdplist)==0:
             for i in range(len(mdp_crypte)):
                 while mdp_crypte[i]>=len(ascii):
                     mdp_crypte[i]=mdp_crypte[i]-len(ascii) 
             return ''.join(ascii[n] for n in mdp_crypte)
-        if mdplist[0]!=ascii[ind_ascii]:
+        ind_ascii=0
+        while mdplist[0]!=ascii[ind_ascii]:
             for i in range(ind_list,len(mdp_crypte)):
                 mdp_crypte[i]+=1
-            return aux(mdplist,ind_ascii+1,ind_list)
-        return aux(mdplist[1:],0,ind_list+1)
-    return aux (mdplist,0,0)
-
+            ind_ascii+=1
+        return aux(mdplist[1:],ind_list+1)
+    return aux (mdplist,0)
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],
