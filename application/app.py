@@ -42,8 +42,16 @@ def pastPropositions():
     dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
     for proposition in dbpropositions:
         datepropose=proposition["dateexpiration"].split('/')
-        if int(datepropose[2])<current_time.year or int(datepropose[1])<current_time.month or int(datepropose[0])<current_time.day:
+        if int(datepropose[2])<current_time.year:
             db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
+        else:
+            if int(datepropose[2])==current_time.year:
+                if int(datepropose[1])<current_time.month:
+                    db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
+                else:
+                    if int(datepropose[1])==current_time.month:
+                        if int(datepropose[0])<current_time.day:
+                            db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
 
 pastPropositions()
 
