@@ -1,0 +1,37 @@
+.divusers{
+    width: 250px;
+}
+
+.fluxmessage{
+    width: 500px;
+}
+
+.message{
+    margin: 20px;
+}
+
+.messageimg{
+    width: 25px;
+    height: 25px;
+    border-radius: 50px;
+}
+
+.sender{
+    float: right;
+    display: flex;
+    align-items: flex-end;
+}
+
+.recipient{
+    float: left;
+    display: flex;
+    align-items: flex-start;
+}
+
+.textsender{
+    text-align: right;
+}
+
+.textrecipient{
+    text-align: left;
+}

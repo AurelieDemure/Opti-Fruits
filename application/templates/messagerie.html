@@ -1,0 +1,64 @@
+{%extends navbar+".html"%}
+
+{%block body%}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='messagerie.css')}}">
+    <div class="divrow space">
+        <div class="divcolumn space divusers">
+            {%for recipient in recipients%}
+                {%if recipient['pseudo']!=profil[0]['pseudo']%}
+                    <a href="/messagerie/{{recipient['pseudo']}}" class="text pseudo lien">
+                        {%if not recipient["profilphoto"]%}
+                            <img class="profilimg" src="{{ url_for('static', filename='images/Default.png')}}">
+                        {%else%}
+                            <img class="profilimg" src="{{ url_for('static', filename='downloadPictures/'+recipient["profilphoto"])}}">
+                        {%endif%}
+                        {{recipient['pseudo']}}
+                    </a>
+                {%endif%}
+            {%endfor%}
+        </div>
+        <div class="divcolumn space fluxmessage">
+            {%for message in messages%}
+                {%if message['pseudo_sender']==profil[0]['pseudo']%}
+                    <div class="divcolumn message sender">
+                        <div class="divrow">
+                            <div class="text">
+                                {{message['pseudo_sender']}}
+                            </div>
+                            {%if not profil[0]["profilphoto"]%}
+                                <img class="messageimg" src="{{ url_for('static', filename='images/Default.png')}}">
+                            {%else%}
+                                <img class="messageimg" src="{{ url_for('static', filename='downloadPictures/'+profil[0]["profilphoto"])}}">
+                            {%endif%}
+                        </div>
+                        <div class="text pseudo textsender">
+                            {{message['message']}}
+                        </div>
+                    </div>
+                {%else%}
+                    <div class="divcolumn message recipient">
+                        <div class="divrow">
+                            {%if not picture%}
+                                <img class="messageimg" src="{{ url_for('static', filename='images/Default.png')}}">
+                            {%else%}
+                                <img class="messageimg" src="{{ url_for('static', filename='downloadPictures/'+picture)}}">
+                            {%endif%}
+                            <div class="text">
+                                {{message['pseudo_sender']}}
+                            </div>
+                        </div>
+                        <div class="text pseudo textrecipient">
+                            {{message['message']}}
+                        </div>
+                    </div>
+                {%endif%}
+            {%endfor%}
+            <form action="/messagerie/{{pseudo}}" method="post" enctype=multipart/form-data>
+                <div class="divrow">
+                    <input name="message" placeholder="Entrez votre message">
+                    <input class="buttongreen" type="submit" value="Envoyer">
+                </div>
+            </form>
+        </div>
+    </div>
+{%endblock%}
