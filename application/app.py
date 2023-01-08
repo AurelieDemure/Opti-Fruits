@@ -22,13 +22,9 @@ Session(app)
 
 #pour verifier que le fichier selectionné est bien du bon format
 def allowed_file(filename):
-    n=len(filename)
-    c=0
-    while c<(n-1) and filename[c]!='.':
-        c=c+1
-    if c<n:
-        extension=filename[(c+1):]
-        return(extension in ALLOWED_EXTENSIONS)
+    namelist=filename.split('.')
+    if len(namelist)==2:
+        return(namelist[1] in ALLOWED_EXTENSIONS)
     return(False)
 
 dbfrumes=db.execute("SELECT nomfrumes FROM frumes")
@@ -315,18 +311,18 @@ def recherche():
 
 @app.route('/recherche/<string:region>')
 def rechercheregion(region:str): 
-    propositions1 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(1)+ "___", str(3)+ "___", str(7)+ "___", str(15)+ "%", str(26)+ "%", str(38)+ "%", str(42)+ "%", str(43)+ "%", str(63)+ "%", str(69)+ "%", str(73)+ "%", str(74)+ "%")
-    propositions2 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(2)+ "___", str(59)+ "%", str(60)+ "%", str(62)+ "%", str(80)+"%")
+    propositions1 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(1)+ "%", "%"+ str(3)+ "%", "%"+ str(7)+ "%", str(15)+ "%", str(26)+ "%", str(38)+ "%", str(42)+ "%", str(43)+ "%", str(63)+ "%", str(69)+ "%", str(73)+ "%", str(74)+ "%")
+    propositions2 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(2)+ "%", str(59)+ "%", str(60)+ "%", str(62)+ "%", str(80)+"%")
     propositions3 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?  or codepostal LIKE ?", str(14)+ "%", str(27)+ "%", str(50)+ "%", str(61)+ "%", str(76)+ "%")
     propositions4 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(75)+ "%", str(77)+ "%", str(78)+ "%", str(91)+ "%", str(92)+ "%", str(93)+ "%", str(94)+ "%", str(95)+ "%")
-    propositions5 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(8)+ "___", str(10)+ "%", str(51)+ "%", str(52)+ "%", str(54)+ "%", str(55)+ "%", str(57)+ "%", str(67)+ "%", str(68)+ "%", str(88)+ "%")
+    propositions5 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(8)+ "%", str(10)+ "%", str(51)+ "%", str(52)+ "%", str(54)+ "%", str(55)+ "%", str(57)+ "%", str(67)+ "%", str(68)+ "%", str(88)+ "%")
     propositions6 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(35)+ "%", str(22)+ "%", str(56)+ "%", str(29)+ "%")
     propositions7 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(44)+ "%", str(49)+ "%", str(53)+ "%", str(72)+ "%", str(85)+ "%")
     propositions8 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(18)+ "%", str(28)+ "%", str(36)+ "%", str(37)+ "%", str(41)+ "%", str(45)+ "%")
     propositions9 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(21)+ "%", str(25)+ "%", str(39)+ "%", str(58)+ "%", str(70)+ "%", str(71)+ "%", str(89)+ "%", str(90)+ "%")
     propositions10 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(16)+ "%", str(17)+ "%", str(19)+ "%", str(23)+ "%", str(24)+ "%", str(33)+ "%", str(40)+ "%", str(47)+ "%", str(64)+ "%", str(79)+ "%", str(86)+ "%", str(87)+ "%")
-    propositions11 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(9)+ "___", str(11)+ "%", str(12)+ "%", str(30)+ "%", str(31)+ "%", str(32)+ "%", str(34)+ "%", str(46)+ "%", str(48)+ "%", str(65)+ "%", str(66)+ "%", str(81)+ "%", str(82) + "%")
-    propositions12 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(4)+ "___", str(5)+ "___", str(6)+ "___", str(13)+ "%", str(83)+ "%", str(84)+ "%")
+    propositions11 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(9)+ "%", str(11)+ "%", str(12)+ "%", str(30)+ "%", str(31)+ "%", str(32)+ "%", str(34)+ "%", str(46)+ "%", str(48)+ "%", str(65)+ "%", str(66)+ "%", str(81)+ "%", str(82) + "%")
+    propositions12 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(4)+ "%", "%"+ str(5)+ "%", "%"+ str(6)+ "%", str(13)+ "%", str(83)+ "%", str(84)+ "%")
     propositions13 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ?", str(20)+ "%")
     if not session.get("name"):
         navbar='unconnectedLayout'
