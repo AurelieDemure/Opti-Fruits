@@ -25,6 +25,9 @@
                 </div>
             </div>
             <div class="divcolumn space fluxmessage">
+                {%if messages==[]%}
+                <div class="text textprop space">Vous n'avez pas encore discuté avec cet utilisateur</div>
+                {%endif%}
                 {%for message in messages%}
                     {%if message['pseudo_sender']==profil[0]['pseudo']%}
                         <div class="divcolumn message sender">
