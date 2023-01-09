@@ -27,11 +27,6 @@ def allowed_file(filename):
         return(namelist[1] in ALLOWED_EXTENSIONS)
     return(False)
 
-dbfrumes=db.execute("SELECT nomfrumes FROM frumes")
-frumes=[]
-for dbfrume in dbfrumes:
-    frumes.append(dbfrume['nomfrumes'])
-
 dbvilles=db.execute("SELECT nom_commune_postal FROM lieux")
 villes=[]
 for dbville in dbvilles:
@@ -176,6 +171,12 @@ def messagerie(pseudo:str):
         recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
         if pseudo=='None':
             return redirect('/messagerie/'+recipients[0]['pseudo'])
+        pseudoRecipient=[]
+        for recipient in recipients:
+            pseudoRecipient.append(recipient["pseudo"])
+        if pseudo not in pseudoRecipient:
+            photo=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
+            recipients=[{'pseudo': pseudo, 'profilphoto': photo, 'lastId': 9}]+recipients
         if request.method=='POST':
             message = request.form.get("message")
             maxid=db.execute("SELECT max(id) as maxid FROM messagerie")
@@ -239,8 +240,6 @@ def propose():
         upperfrume=frume.upper()
         if upperfrume[-1]=='S':
             upperfrume=upperfrume[:-1]
-        if not upperfrume in frumes:
-            return render_template("propose.html",message='Fruit ou légume inconnu.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         if not quantite:
             return render_template("propose.html",message='Veuillez entrer une quantité.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         if not codePostal:
