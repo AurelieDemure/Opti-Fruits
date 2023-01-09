@@ -32,24 +32,45 @@ villes=[]
 for dbville in dbvilles:
     villes.append(dbville['nom_commune_postal'])
 
-def pastPropositions():
+def pastPropositions(propositions):
     current_time = datetime.datetime.now()
-    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
-    print(dbpropositions)
-    for proposition in dbpropositions:
-        datepropose=proposition["dateexpiration"].split('/')
-        if int(datepropose[2])<current_time.year:
-            db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
-        else:
-            if int(datepropose[2])==current_time.year:
-                if int(datepropose[1])<current_time.month:
-                    db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
-                else:
-                    if int(datepropose[1])==current_time.month:
-                        if int(datepropose[0])<current_time.day:
-                            db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
+    list=[]
+    for proposition in propositions:
+        if len(proposition)==2:
+            id=int(proposition[0])
+            date=proposition[1]
+            datepropose=date[:-1].split('/')
+            if len(datepropose)==3:
+                valide=True
+                if len(datepropose[0])>2 or len(datepropose[1])>2 or len(datepropose[0])<1 or len(datepropose[1])<1 or len(datepropose[2])!=4:
+                    valide=False
+                if valide:
+                    for i in datepropose:
+                        for l in i:
+                            if l not in ['0','1','2','3','4','5','6','7','8','9','/']:
+                                valide=False
+                    if valide:
+                        if int(datepropose[2])<current_time.year:
+                            list.append(id)
+                        else:
+                            if int(datepropose[2])==current_time.year:
+                                if int(datepropose[1])<current_time.month:
+                                    list.append(id)
+                                else:
+                                    if int(datepropose[1])==current_time.month:
+                                        if int(datepropose[0])<current_time.day:
+                                            list.append(id)
+    return(list)
 
-pastPropositions()
+def suppr_pastProp():
+    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
+    propositions=[]
+    for proposition in dbpropositions:
+        propositions.append([proposition["noprop"],proposition["dateexpiration"]])
+    for idproposition in pastPropositions(propositions):
+        db.execute("DELETE FROM proposition WHERE noprop=?", idproposition)
+
+suppr_pastProp()
 
 @app.route('/')
 def homeDev():
