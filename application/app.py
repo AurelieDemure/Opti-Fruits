@@ -171,6 +171,12 @@ def messagerie(pseudo:str):
         recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
         if pseudo=='None':
             return redirect('/messagerie/'+recipients[0]['pseudo'])
+        pseudoRecipient=[]
+        for recipient in recipients:
+            pseudoRecipient.append(recipient["pseudo"])
+        if pseudo not in pseudoRecipient:
+            photo=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
+            recipients=[{'pseudo': pseudo, 'profilphoto': photo, 'lastId': 9}]+recipients
         if request.method=='POST':
             message = request.form.get("message")
             maxid=db.execute("SELECT max(id) as maxid FROM messagerie")
