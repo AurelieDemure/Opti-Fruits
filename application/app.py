@@ -20,30 +20,21 @@ app.config["SESSION_TYPE"]='filesystem'
 app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 Session(app)
 
-#pour verifier que le fichier selectionné est bien du bon format
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-dbfrumes=db.execute("SELECT nomfrumes FROM frumes")
-frumes=[]
-for dbfrume in dbfrumes:
-    frumes.append(dbfrume['nomfrumes'])
-
 dbvilles=db.execute("SELECT nom_commune_postal FROM lieux")
 villes=[]
 for dbville in dbvilles:
     villes.append(dbville['nom_commune_postal'])
 
-def pastPropositions():
-    current_time = datetime.datetime.now()
-    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
-    for proposition in dbpropositions:
-        datepropose=proposition["dateexpiration"].split('/')
-        if int(datepropose[2])<current_time.year or int(datepropose[1])<current_time.month or int(datepropose[0])<current_time.day:
-            db.execute("DELETE FROM proposition WHERE noprop=?", proposition["noprop"])
+def newID(maxid):
+    if maxid==None or type(maxid)!=int:
+        maxid=0
+    return(int(maxid)+1)
 
-pastPropositions()
+def valideNameFrume(frume):
+    upperfrume=frume.upper()
+    if upperfrume[-1]=='S':
+        upperfrume=upperfrume[:-1]
+    return upperfrume
 
 @app.route('/')
 def homeDev():
@@ -95,7 +86,6 @@ def connexion():
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
-
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
     if session.get("name"):
@@ -124,6 +114,10 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not password :
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
+        if len(password) <=8 or len(password) >= 20 :
+            return render_template("inscription.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
+        if not mdpcorrect(password) :
+            return render_template("inscription.html", message='Votre mot de passe contient un caractère non autorisé', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not confirm_password : 
             return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
@@ -154,6 +148,31 @@ def logout():
     session['name']=None
     return redirect('/')
 
+@app.route("/messagerie/<string:pseudo>",methods=['GET','POST'])
+def messagerie(pseudo:str):
+    if not session.get("name"):
+            return redirect('/')
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
+        if pseudo=='None':
+            return redirect('/messagerie/'+recipients[0]['pseudo'])
+        pseudoRecipient=[]
+        for recipient in recipients:
+            pseudoRecipient.append(recipient["pseudo"])
+        if pseudo not in pseudoRecipient:
+            photo=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
+            recipients=[{'pseudo': pseudo, 'profilphoto': photo}]+recipients
+        if request.method=='POST':
+            message = request.form.get("message")
+            maxid=db.execute("SELECT max(id) as maxid FROM messagerie")
+            id=newID(maxid[0]['maxid'])
+            db.execute('INSERT INTO messagerie (id,pseudo_sender,pseudo_recipient,message) VALUES(?,?,?,?)',id,profil[0]['pseudo'],pseudo,message)
+        messages=db.execute("SELECT * FROM messagerie WHERE (pseudo_sender=? and pseudo_recipient=?) or (pseudo_sender=? and pseudo_recipient=?) ORDER BY id",profil[0]['pseudo'],pseudo,pseudo,profil[0]['pseudo'])
+        picture=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
+        return render_template("messagerie.html", pseudo=pseudo,picture=picture,recipients=recipients,messages=messages,navbar=navbar,profil=profil)
+
 @app.route('/profil/<string:mail>')
 def profil(mail:str):
     utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE mail=?",mail)
@@ -171,8 +190,6 @@ def profil(mail:str):
     navbar='unconnectedLayout'
     return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar)
 
-
-
 @app.route('/propose',methods=['GET','POST'])
 def propose():
     if not session.get("name"):
@@ -180,9 +197,7 @@ def propose():
     navbar='connectedLayout'
     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
     maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
-    if maxNoProp[0]["maxnoprop"]==None:
-        maxNoProp[0]["maxnoprop"]=0
-    noProp=int(maxNoProp[0]["maxnoprop"])+1
+    noProp=newID(maxNoProp[0]["maxnoprop"])
     if request.method=='GET':
         return render_template("propose.html",message='', noprop=noProp, navbar=navbar,profil=profil)
     if request.method=='POST':
@@ -195,7 +210,6 @@ def propose():
         cueillette=request.form.get("cueillette")
         description=request.form.get("description")
         photo=request.files['photo']
-        print(description)
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -203,11 +217,7 @@ def propose():
             filename="no picture"
         if not frume:
             return render_template("propose.html",message='Veuillez entrer un fruit ou légume.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
-        upperfrume=frume.upper()
-        if upperfrume[-1]=='S':
-            upperfrume=upperfrume[:-1]
-        if not upperfrume in frumes:
-            return render_template("propose.html",message='Fruit ou légume inconnu.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+        upperfrume=valideNameFrume(frume)
         if not quantite:
             return render_template("propose.html",message='Veuillez entrer une quantité.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         if not codePostal:
@@ -216,15 +226,17 @@ def propose():
             return render_template("propose.html",message='Veuillez entrez une ville.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         upperville=ville.upper()
         if not upperville in villes:
-            return render_template("propose.html",message='Ville inconnu.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+            return render_template("propose.html",message='Ville inconnue.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         dbcps=db.execute("SELECT code_postal FROM lieux WHERE nom_commune_postal=?",upperville)
         cps=[]
         for dbcp in dbcps:
             cps.append(dbcp['code_postal'])
         if not int(codePostal) in cps:
             return render_template("propose.html",message='Ville ou code postal incorrecte.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
-        if not dateCueillette:
-            return render_template("propose.html",message='Veuillez entrer une date de cueillette.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+        if not dateCueillette and not cueillette:
+            return render_template("propose.html",message='Veuillez entrer une date de cueillette ou indiquer si vos fruits sont à cueillir.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+        if dateCueillette and cueillette:
+            return render_template("propose.html",message="Veuillez ne pas préciser de date de cueillette si vos fruits sont à cueillir", noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)  
         if not dateFin:
             return render_template("propose.html",message='Veuillez entrer une date de fin.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         if filename=="no picture":
@@ -289,18 +301,18 @@ def recherche():
 
 @app.route('/recherche/<string:region>')
 def rechercheregion(region:str): 
-    propositions1 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(1)+ "%", "%"+ str(3)+ "%", "%"+ str(7)+ "%", str(15)+ "%", str(26)+ "%", str(38)+ "%", str(42)+ "%", str(43)+ "%", str(63)+ "%", str(69)+ "%", str(73)+ "%", str(74)+ "%")
-    propositions2 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(2)+ "%", str(59)+ "%", str(60)+ "%", str(62)+ "%", str(80)+"%")
+    propositions1 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(1)+ "___", str(3)+ "___", str(7)+ "___", str(15)+ "%", str(26)+ "%", str(38)+ "%", str(42)+ "%", str(43)+ "%", str(63)+ "%", str(69)+ "%", str(73)+ "%", str(74)+ "%")
+    propositions2 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(2)+ "___", str(59)+ "%", str(60)+ "%", str(62)+ "%", str(80)+"%")
     propositions3 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?  or codepostal LIKE ?", str(14)+ "%", str(27)+ "%", str(50)+ "%", str(61)+ "%", str(76)+ "%")
     propositions4 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(75)+ "%", str(77)+ "%", str(78)+ "%", str(91)+ "%", str(92)+ "%", str(93)+ "%", str(94)+ "%", str(95)+ "%")
-    propositions5 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(8)+ "%", str(10)+ "%", str(51)+ "%", str(52)+ "%", str(54)+ "%", str(55)+ "%", str(57)+ "%", str(67)+ "%", str(68)+ "%", str(88)+ "%")
+    propositions5 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(8)+ "___", str(10)+ "%", str(51)+ "%", str(52)+ "%", str(54)+ "%", str(55)+ "%", str(57)+ "%", str(67)+ "%", str(68)+ "%", str(88)+ "%")
     propositions6 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(35)+ "%", str(22)+ "%", str(56)+ "%", str(29)+ "%")
     propositions7 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(44)+ "%", str(49)+ "%", str(53)+ "%", str(72)+ "%", str(85)+ "%")
     propositions8 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(18)+ "%", str(28)+ "%", str(36)+ "%", str(37)+ "%", str(41)+ "%", str(45)+ "%")
     propositions9 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(21)+ "%", str(25)+ "%", str(39)+ "%", str(58)+ "%", str(70)+ "%", str(71)+ "%", str(89)+ "%", str(90)+ "%")
     propositions10 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(16)+ "%", str(17)+ "%", str(19)+ "%", str(23)+ "%", str(24)+ "%", str(33)+ "%", str(40)+ "%", str(47)+ "%", str(64)+ "%", str(79)+ "%", str(86)+ "%", str(87)+ "%")
-    propositions11 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(9)+ "%", str(11)+ "%", str(12)+ "%", str(30)+ "%", str(31)+ "%", str(32)+ "%", str(34)+ "%", str(46)+ "%", str(48)+ "%", str(65)+ "%", str(66)+ "%", str(81)+ "%", str(82) + "%")
-    propositions12 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", "%"+ str(4)+ "%", "%"+ str(5)+ "%", "%"+ str(6)+ "%", str(13)+ "%", str(83)+ "%", str(84)+ "%")
+    propositions11 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(9)+ "___", str(11)+ "%", str(12)+ "%", str(30)+ "%", str(31)+ "%", str(32)+ "%", str(34)+ "%", str(46)+ "%", str(48)+ "%", str(65)+ "%", str(66)+ "%", str(81)+ "%", str(82) + "%")
+    propositions12 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ? or codepostal LIKE ?", str(4)+ "___", str(5)+ "___", str(6)+ "___", str(13)+ "%", str(83)+ "%", str(84)+ "%")
     propositions13 = db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE codepostal LIKE ?", str(20)+ "%")
     if not session.get("name"):
         navbar='unconnectedLayout'
@@ -320,7 +332,7 @@ def rechercheregion(region:str):
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions7)
         if region=="CentreValdeLoire":
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions8)
-        if region=="BourgogneFranceComté":
+        if region=="BourgogneFrancheComté":
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions9)
         if region=="NouvelleAquitaine":
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions10)
@@ -360,7 +372,6 @@ def rechercheregion(region:str):
         if region=="Corse":
             return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions13) 
 
-
 @app.route('/supprPropose/<int:id>')
 def supprPropose(id:int):
     if not session.get("name"):
@@ -380,22 +391,79 @@ def todo():
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
         return render_template("TODO.html",navbar=navbar,profil=profil)
 
+#pour verifier que le fichier selectionné est bien du bon format
+def allowed_file(filename):
+    namelist=filename.split('.')
+    if len(namelist)==2:
+        return(namelist[1] in ALLOWED_EXTENSIONS)
+    return(False)
 
 def crypte_mdp(mdp):
-    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
-    L=[0]*len(mdp)
+    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
+    mdp_crypte=[0]*len(mdp)
     mdplist=[]
     for x in mdp:
         mdplist.append(x)
-    def aux(mdplist,ind_ascii):
+    def aux(mdplist,ind_list):
         if len(mdplist)==0:
-            return ''.join(str(n) for n in L)
-        if mdplist[0]!=ascii[ind_ascii]:
-            for i in range(len(L)):
-                L[i]+=1
-            return aux(mdplist,ind_ascii+1)
-        return aux(mdplist[1:],0)
+            for i in range(len(mdp_crypte)):
+                while mdp_crypte[i]>=len(ascii):
+                    mdp_crypte[i]=mdp_crypte[i]-len(ascii) 
+            return ''.join(ascii[n] for n in mdp_crypte)
+        ind_ascii=0
+        while mdplist[0]!=ascii[ind_ascii]:
+            for i in range(ind_list,len(mdp_crypte)):
+                mdp_crypte[i]+=1
+            ind_ascii+=1
+        return aux(mdplist[1:],ind_list+1)
     return aux (mdplist,0)
+
+def mdpcorrect(mdp):
+    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
+    for lettre in mdp:
+        if lettre not in ascii:
+            return False
+    return True
+
+def pastPropositions(propositions):
+    current_time = datetime.datetime.now()
+    list=[]
+    for proposition in propositions:
+        if len(proposition)==2:
+            id=int(proposition[0])
+            date=proposition[1]
+            datepropose=date[:-1].split('/')
+            if len(datepropose)==3:
+                valide=True
+                if len(datepropose[0])>2 or len(datepropose[1])>2 or len(datepropose[0])<1 or len(datepropose[1])<1 or len(datepropose[2])!=4:
+                    valide=False
+                if valide:
+                    for i in datepropose:
+                        for l in i:
+                            if l not in ['0','1','2','3','4','5','6','7','8','9','/']:
+                                valide=False
+                    if valide:
+                        if int(datepropose[2])<current_time.year:
+                            list.append(id)
+                        else:
+                            if int(datepropose[2])==current_time.year:
+                                if int(datepropose[1])<current_time.month:
+                                    list.append(id)
+                                else:
+                                    if int(datepropose[1])==current_time.month:
+                                        if int(datepropose[0])<current_time.day:
+                                            list.append(id)
+    return(list)
+
+def suppr_pastProp():
+    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
+    propositions=[]
+    for proposition in dbpropositions:
+        propositions.append([proposition["noprop"],proposition["dateexpiration"]])
+    for idproposition in pastPropositions(propositions):
+        db.execute("DELETE FROM proposition WHERE noprop=?", idproposition)
+
+suppr_pastProp()
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],

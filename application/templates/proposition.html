@@ -7,6 +7,9 @@
     <div class="divprop divcolumn propose centre">
         <div class="divprop divrow space centre">
             <div class="divprop divcolumn centre">
+                {%if proposition[0]["pseudo"]!=profil[0]["pseudo"]%}
+                <a class="lien" href="/messagerie/{{proposition[0]["pseudo"]}}">
+                {%endif%}
                 <div class="divcolumn">
                     {%if not proposition[0]["profilphoto"]%}
                         <img class="propimg" src="{{ url_for('static', filename='images/Default.png')}}">
@@ -15,6 +18,7 @@
                     {%endif%}
                     <p class="text space pseudo">{{proposition[0]["pseudo"]}}</p>
                 </div>
+                </a>
                 <div class="divprop divcolumn centre">
                     <div class="divprop text textprop">Fruits / Légumes proposé :</div>
                     <div class="divprop textprop">{{proposition[0]["nomfrumes"]}}</div>
@@ -40,8 +44,10 @@
             </div>
             <div class="divprop divcolumn centre">
                 <div class="divprop divcolumn centre">
-                    <div class="divprop text textprop">Date de la cueillette :</div>
-                    <div class="divprop textprop">{{proposition[0]["datecueillette"]}}</div>
+                    {%if proposition[0]["cueillette"]=="Non" %}
+                        <div class="divprop text textprop">Date de la cueillette :</div>
+                        <div class="divprop textprop">{{proposition[0]["datecueillette"]}}</div>
+                    {%endif%}
                 </div>
                 <div class="divprop divcolumn centre">
                     <div class="divprop text textprop">Date d'expiration de la demande :</div>

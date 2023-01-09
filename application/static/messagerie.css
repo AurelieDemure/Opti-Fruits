@@ -1,0 +1,77 @@
+.center{
+    align-items: center;
+}
+
+.divusers{
+    width: 250px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.fluxmessage{
+    width: 500px;
+    background-color: var(--light-green);
+    padding: 10px;
+    border-radius: 0 50px 50px 50px;
+    color: var(--dark-pink);
+    border: 2px solid;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.input{
+    border-color: black;
+    border-radius:10px;
+}
+
+.maindiv{
+    margin: 25px;
+}
+
+.message{
+    margin: 20px;
+}
+
+.messageimg{
+    width: 25px;
+    height: 25px;
+    border-radius: 50px;
+}
+
+.messagetext{
+    padding: 10px;
+    border-radius: 50px;
+    box-shadow: 0 1px 8px 0 rgba(0,0,0,.2),0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12);
+}
+
+.sender{
+    float: right;
+    display: flex;
+    align-items: flex-end;
+}
+
+.recipient{
+    float: left;
+    display: flex;
+    align-items: flex-start;
+}
+
+.textsender{
+    text-align: right;
+    background-color: var(--light-pink);
+}
+
+.textrecipient{
+    text-align: left;
+    background-color: var(--dark-pink);
+}
+
+.user{
+    background-color: var(--dark-pink);
+    color: var(--dark-green);
+    border: 2px solid;
+    padding: 10px;
+}
+
+.userrecipient{
+    background-color: var(--light-green);
+    color:var(--dark-pink)
+}
