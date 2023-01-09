@@ -130,8 +130,10 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not password :
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
-        if len(password) <=8 or len(password) >= 30 :
-            return render_template("inscription.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 30 caractères', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
+        if len(password) <=8 or len(password) >= 20 :
+            return render_template("inscription.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
+        if not mdpcorrect(password) :
+            return render_template("inscription.html", message='Votre mot de passe contient un caractère non autorisé', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not confirm_password : 
             return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
@@ -249,15 +251,17 @@ def propose():
             return render_template("propose.html",message='Veuillez entrez une ville.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         upperville=ville.upper()
         if not upperville in villes:
-            return render_template("propose.html",message='Ville inconnu.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+            return render_template("propose.html",message='Ville inconnue.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         dbcps=db.execute("SELECT code_postal FROM lieux WHERE nom_commune_postal=?",upperville)
         cps=[]
         for dbcp in dbcps:
             cps.append(dbcp['code_postal'])
         if not int(codePostal) in cps:
             return render_template("propose.html",message='Ville ou code postal incorrecte.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
-        if not dateCueillette:
-            return render_template("propose.html",message='Veuillez entrer une date de cueillette.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+        if not dateCueillette and not cueillette:
+            return render_template("propose.html",message='Veuillez entrer une date de cueillette ou indiquer si vos fruits sont à cueillir.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
+        if dateCueillette and cueillette:
+            return render_template("propose.html",message="Veuillez ne pas préciser de date de cueillette si vos fruits sont à cueillir", noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)  
         if not dateFin:
             return render_template("propose.html",message='Veuillez entrer une date de fin.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         if filename=="no picture":
@@ -433,6 +437,14 @@ def crypte_mdp(mdp):
             ind_ascii+=1
         return aux(mdplist[1:],ind_list+1)
     return aux (mdplist,0)
+
+def mdpcorrect(mdp):
+    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
+    for lettre in mdp:
+        if lettre not in ascii:
+            return False
+    return True
+
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],

@@ -5,6 +5,9 @@
 
     <h1>Résultats</h1>
     <div class="propositions">
+        {%if propositions==[]%}
+            <p class="message">Aucun résultat</p>
+        {%endif%}
         {%for proposition in propositions%}
                     <a class="proposition" href="/proposition/{{proposition.noprop}}">
                         <div class="propose divrow space">
