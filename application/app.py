@@ -35,6 +35,7 @@ for dbville in dbvilles:
 def pastPropositions():
     current_time = datetime.datetime.now()
     dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
+    print(dbpropositions)
     for proposition in dbpropositions:
         datepropose=proposition["dateexpiration"].split('/')
         if int(datepropose[2])<current_time.year:

@@ -12,3 +12,4 @@ def test_allowed_file():
     assert(allowed_file('picture.jpeg'))
     assert(not allowed_file('picture.jqsdpj'))
     assert(not allowed_file('picture'))
+    assert(not allowed_file('pic.ture.jpeg'))
