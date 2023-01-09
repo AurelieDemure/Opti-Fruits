@@ -131,6 +131,8 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if len(password) <=8 or len(password) >= 20 :
             return render_template("inscription.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
+        if not mdpcorrect(password) :
+            return render_template("inscription.html", message='Votre mot de passe contient un caractère non autorisé', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not confirm_password : 
             return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
@@ -434,6 +436,14 @@ def crypte_mdp(mdp):
             ind_ascii+=1
         return aux(mdplist[1:],ind_list+1)
     return aux (mdplist,0)
+
+def mdpcorrect(mdp):
+    ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
+    for lettre in mdp:
+        if lettre not in ascii:
+            return False
+    return True
+
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],
