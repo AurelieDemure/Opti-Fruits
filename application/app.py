@@ -20,57 +20,21 @@ app.config["SESSION_TYPE"]='filesystem'
 app.config['UPLOAD_FOLDER']=UPLOAD_FOLDER
 Session(app)
 
-#pour verifier que le fichier selectionné est bien du bon format
-def allowed_file(filename):
-    namelist=filename.split('.')
-    if len(namelist)==2:
-        return(namelist[1] in ALLOWED_EXTENSIONS)
-    return(False)
-
 dbvilles=db.execute("SELECT nom_commune_postal FROM lieux")
 villes=[]
 for dbville in dbvilles:
     villes.append(dbville['nom_commune_postal'])
 
-def pastPropositions(propositions):
-    current_time = datetime.datetime.now()
-    list=[]
-    for proposition in propositions:
-        if len(proposition)==2:
-            id=int(proposition[0])
-            date=proposition[1]
-            datepropose=date[:-1].split('/')
-            if len(datepropose)==3:
-                valide=True
-                if len(datepropose[0])>2 or len(datepropose[1])>2 or len(datepropose[0])<1 or len(datepropose[1])<1 or len(datepropose[2])!=4:
-                    valide=False
-                if valide:
-                    for i in datepropose:
-                        for l in i:
-                            if l not in ['0','1','2','3','4','5','6','7','8','9','/']:
-                                valide=False
-                    if valide:
-                        if int(datepropose[2])<current_time.year:
-                            list.append(id)
-                        else:
-                            if int(datepropose[2])==current_time.year:
-                                if int(datepropose[1])<current_time.month:
-                                    list.append(id)
-                                else:
-                                    if int(datepropose[1])==current_time.month:
-                                        if int(datepropose[0])<current_time.day:
-                                            list.append(id)
-    return(list)
+def newID(maxid):
+    if maxid==None or type(maxid)!=int:
+        maxid=0
+    return(int(maxid)+1)
 
-def suppr_pastProp():
-    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
-    propositions=[]
-    for proposition in dbpropositions:
-        propositions.append([proposition["noprop"],proposition["dateexpiration"]])
-    for idproposition in pastPropositions(propositions):
-        db.execute("DELETE FROM proposition WHERE noprop=?", idproposition)
-
-suppr_pastProp()
+def valideNameFrume(frume):
+    upperfrume=frume.upper()
+    if upperfrume[-1]=='S':
+        upperfrume=upperfrume[:-1]
+    return upperfrume
 
 @app.route('/')
 def homeDev():
@@ -121,7 +85,6 @@ def connexion():
             return redirect('/profil/'+mail)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
-
 
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
@@ -200,13 +163,11 @@ def messagerie(pseudo:str):
             pseudoRecipient.append(recipient["pseudo"])
         if pseudo not in pseudoRecipient:
             photo=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
-            recipients=[{'pseudo': pseudo, 'profilphoto': photo, 'lastId': 9}]+recipients
+            recipients=[{'pseudo': pseudo, 'profilphoto': photo}]+recipients
         if request.method=='POST':
             message = request.form.get("message")
             maxid=db.execute("SELECT max(id) as maxid FROM messagerie")
-            if maxid[0]["maxid"]==None:
-                maxid[0]["maxid"]=0
-            id=int(maxid[0]["maxid"])+1
+            id=newID(maxid[0]['maxid'])
             db.execute('INSERT INTO messagerie (id,pseudo_sender,pseudo_recipient,message) VALUES(?,?,?,?)',id,profil[0]['pseudo'],pseudo,message)
         messages=db.execute("SELECT * FROM messagerie WHERE (pseudo_sender=? and pseudo_recipient=?) or (pseudo_sender=? and pseudo_recipient=?) ORDER BY id",profil[0]['pseudo'],pseudo,pseudo,profil[0]['pseudo'])
         picture=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
@@ -229,8 +190,6 @@ def profil(mail:str):
     navbar='unconnectedLayout'
     return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar)
 
-
-
 @app.route('/propose',methods=['GET','POST'])
 def propose():
     if not session.get("name"):
@@ -238,9 +197,7 @@ def propose():
     navbar='connectedLayout'
     profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
     maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
-    if maxNoProp[0]["maxnoprop"]==None:
-        maxNoProp[0]["maxnoprop"]=0
-    noProp=int(maxNoProp[0]["maxnoprop"])+1
+    noProp=newID(maxNoProp[0]["maxnoprop"])
     if request.method=='GET':
         return render_template("propose.html",message='', noprop=noProp, navbar=navbar,profil=profil)
     if request.method=='POST':
@@ -253,7 +210,6 @@ def propose():
         cueillette=request.form.get("cueillette")
         description=request.form.get("description")
         photo=request.files['photo']
-        print(description)
         if photo and allowed_file(photo.filename):
             filename = secure_filename(photo.filename)
             photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -261,9 +217,7 @@ def propose():
             filename="no picture"
         if not frume:
             return render_template("propose.html",message='Veuillez entrer un fruit ou légume.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
-        upperfrume=frume.upper()
-        if upperfrume[-1]=='S':
-            upperfrume=upperfrume[:-1]
+        upperfrume=valideNameFrume(frume)
         if not quantite:
             return render_template("propose.html",message='Veuillez entrer une quantité.', noprop=noProp, frume=frume,quantite=quantite,codePostal=codePostal,ville=ville,dateCueillette=dateCueillette,dateFin=dateFin,description=description,cueillette=cueillette, photo=filename,navbar=navbar,profil=profil)
         if not codePostal:
@@ -418,7 +372,6 @@ def rechercheregion(region:str):
         if region=="Corse":
             return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions13) 
 
-
 @app.route('/supprPropose/<int:id>')
 def supprPropose(id:int):
     if not session.get("name"):
@@ -438,6 +391,12 @@ def todo():
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
         return render_template("TODO.html",navbar=navbar,profil=profil)
 
+#pour verifier que le fichier selectionné est bien du bon format
+def allowed_file(filename):
+    namelist=filename.split('.')
+    if len(namelist)==2:
+        return(namelist[1] in ALLOWED_EXTENSIONS)
+    return(False)
 
 def crypte_mdp(mdp):
     ascii=["!", '"', "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "", "]", "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~"]
@@ -466,6 +425,45 @@ def mdpcorrect(mdp):
             return False
     return True
 
+def pastPropositions(propositions):
+    current_time = datetime.datetime.now()
+    list=[]
+    for proposition in propositions:
+        if len(proposition)==2:
+            id=int(proposition[0])
+            date=proposition[1]
+            datepropose=date[:-1].split('/')
+            if len(datepropose)==3:
+                valide=True
+                if len(datepropose[0])>2 or len(datepropose[1])>2 or len(datepropose[0])<1 or len(datepropose[1])<1 or len(datepropose[2])!=4:
+                    valide=False
+                if valide:
+                    for i in datepropose:
+                        for l in i:
+                            if l not in ['0','1','2','3','4','5','6','7','8','9','/']:
+                                valide=False
+                    if valide:
+                        if int(datepropose[2])<current_time.year:
+                            list.append(id)
+                        else:
+                            if int(datepropose[2])==current_time.year:
+                                if int(datepropose[1])<current_time.month:
+                                    list.append(id)
+                                else:
+                                    if int(datepropose[1])==current_time.month:
+                                        if int(datepropose[0])<current_time.day:
+                                            list.append(id)
+    return(list)
+
+def suppr_pastProp():
+    dbpropositions=db.execute("SELECT noprop,dateexpiration FROM proposition")
+    propositions=[]
+    for proposition in dbpropositions:
+        propositions.append([proposition["noprop"],proposition["dateexpiration"]])
+    for idproposition in pastPropositions(propositions):
+        db.execute("DELETE FROM proposition WHERE noprop=?", idproposition)
+
+suppr_pastProp()
 
 REGIONS = {
     'Auvergne-Rhône-Alpes': ['01', '03', '07', '15', '26', '38', '42', '43', '63', '69', '73', '74'],
