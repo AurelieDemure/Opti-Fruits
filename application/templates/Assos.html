@@ -7,10 +7,14 @@
     <input class="recherche" type="submit" value="Rechercher">
 </form>
 
+
+{%if assos==[]%}
+        <p class="aucun_resultat">Aucun résultat pour {{ville}}</p>
+{%elif ville!=''%}
+    <div class="message">Résultats pour {{ville}}</div>
+{%endif%}
+
 <div class="associations">
-        {%if assos==[]%}
-            <p class="message">Aucun résultat</p>
-        {%endif%}
         {%for asso in assos%}
             <div class="asso">
                 <p>{{asso.nom}}</p>

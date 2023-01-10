@@ -56,15 +56,17 @@ def assos():
     print(request)
     if request.args.get('q') is not None:
         assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
+        ville=request.args.get("q")
     else:
         assos=db.execute("SELECT * FROM association ORDER BY ville")
+        ville=''
     if not session.get("name"):
         navbar='unconnectedLayout'
-        return render_template("Assos.html",assos=assos,navbar=navbar)
+        return render_template("Assos.html",assos=assos,navbar=navbar,ville=ville)
     else:
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil)
+        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil,ville=ville)
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
