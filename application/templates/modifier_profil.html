@@ -1,9 +1,9 @@
-{%extends "unconnectedLayout.html"%}
+{%extends "connectedLayout.html"%}
 
 {%block body%}
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href={{url_for('static', filename="inscription.css")}}> 
-    <form action="/inscription" method="POST" enctype=multipart/form-data>
+    <form action="/modifierprofil/{{profil[0]['pseudo']}}" method="POST" enctype=multipart/form-data>
     <div class="page">
             <div class="Identité">
                 <div class="Text">Nom :</div>
@@ -27,12 +27,16 @@
                 <div class="Text">Mentions :</div>
                 <input class="input" name="mention" placeholder="ex : horaires de disponibilité, passions..." value={{mention}}>
                 <p>
+                   <!-- <input type="checkbox" class="choix photo" name="choix photo" value="profilphoto"> -->
                     <div class="Text">Photo de profil : </div>
                     <input class="input" name="profilphoto" type="file" value={{profilphoto}} accept="image/x-png,image/jpg,image/jpeg">
+                    <!-- <input type="checkbox" class="choix photo" name="choix photo" value="defaultphoto">
+                    <div class="Text">Photo par défault :</div>
+                    <img class="defaultphoto" name="defaultphoto" src={{url_for('static', filename="Profil1.png")}}> -->
                 </p>
             </div> 
             <div class="erreur">{{message}}</div>
-            <input class="buttongreen" type="submit" value="VALIDER">             
+            <input class="buttongreen" type="submit" value="MODIFIER">             
     </div>
     </form>
 {%endblock%}

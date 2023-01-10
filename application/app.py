@@ -43,7 +43,7 @@ def homeDev():
     propositions=db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo")
     if session.get("name"):
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         if profil!=[]:
             return render_template('home.html',navbar=navbar,profil=profil,propositions=propositions)
         else:
@@ -84,11 +84,14 @@ def connexion():
             return render_template("connexion.html", message="Veuillez renseigner votre mot de passe", mail=mail)
         password=db.execute("SELECT password FROM utilisateur WHERE password=?",password)
         password2=db.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
-        if password2 == password:
-            session["name"]=mail
-            return redirect('/profil/'+mail)
+        if password2 == password and password!=[]:
+            pseudo=db.execute("SELECT pseudo FROM utilisateur WHERE mail=?",mail)
+            pseudo=pseudo[0]['pseudo']
+            session["name"]=pseudo
+            return redirect('/profil/'+pseudo)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
+
 
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
@@ -118,7 +121,7 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not password :
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
-        if len(password) <=8 or len(password) >= 20 :
+        if len(password) <8 or len(password) > 20 :
             return render_template("inscription.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not mdpcorrect(password) :
             return render_template("inscription.html", message='Votre mot de passe contient un caractère non autorisé', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
@@ -126,8 +129,6 @@ def inscription():
             return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
             return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
-        # if not profilphoto in ALLOWED_EXTENSIONS:
-        #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         password=crypte_mdp(password)
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
@@ -135,22 +136,34 @@ def inscription():
             connection = sqlite3.connect('bd4.db')
             try : 
                 connection = sqlite3.connect('bd4.db')
-                # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
                 connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, pseudo, tel, mail, password, mention, filename))   
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         else : 
+<<<<<<< HEAD
+            try:
+                connection = sqlite3.connect('bd4.db')
+                connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
+            except sqlite3.IntegrityError : 
+                return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+=======
             connection = sqlite3.connect('bd4.db')
-            # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', NULL)")
             connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
+>>>>>>> 9ffe2b7dc13327b9c64e786bf0804884e081f9d2
         connection.commit()
-        # return redirect('/profil/'+mail)
         connection.close()
-        session["name"]=mail
-        return redirect('/profil/'+mail)
+        session["name"]=pseudo
+        return redirect('/profil/'+pseudo)
 
 @app.route('/logout')
 def logout():
+    session['name']=None
+    return redirect('/')
+
+@app.route('/delete')
+def delete():
+    db.execute("DELETE FROM proposition WHERE pseudo=?",session.get("name"))
+    db.execute("DELETE FROM utilisateur WHERE pseudo=?",session.get("name"))
     session['name']=None
     return redirect('/')
 
@@ -160,10 +173,13 @@ def messagerie(pseudo:str):
             return redirect('/')
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
         if pseudo=='None':
-            return redirect('/messagerie/'+recipients[0]['pseudo'])
+            if recipients==[]:
+                return render_template("messagerie.html", pseudo=pseudo,recipients=recipients,navbar=navbar,profil=profil)
+            else:
+                return redirect('/messagerie/'+recipients[0]['pseudo'])
         pseudoRecipient=[]
         for recipient in recipients:
             pseudoRecipient.append(recipient["pseudo"])
@@ -179,11 +195,11 @@ def messagerie(pseudo:str):
         picture=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
         return render_template("messagerie.html", pseudo=pseudo,picture=picture,recipients=recipients,messages=messages,navbar=navbar,profil=profil)
 
-@app.route('/profil/<string:mail>')
-def profil(mail:str):
-    utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE mail=?",mail)
-    propositions=db.execute("SELECT * FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE u.mail=?",mail)            
-    photo_profil=db.execute("SELECT profilphoto FROM utilisateur WHERE mail=?",mail)
+@app.route('/profil/<string:pseudo>')
+def profil(pseudo:str):
+    utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE pseudo=?",pseudo)
+    propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",pseudo)            
+    photo_profil=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)
     if photo_profil==[{'profilphoto': None}]:
         photo_profil='images/Default.png'
     else:
@@ -191,17 +207,92 @@ def profil(mail:str):
             photo_profil='downloadPictures/'+str(photoprofil['profilphoto'])
     if session.get("name"):
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar,profil=profil)
     navbar='unconnectedLayout'
     return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar)
+
+@app.route('/modifierprofil/<string:pseudo>',methods=['GET','POST'])
+def modifier_profil(pseudo:str):
+    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
+    if pseudo!=profil[0]['pseudo']:
+        return redirect('/home')
+    if request.method=='GET':
+        return render_template("modifier_profil.html",profil=profil)
+    if request.method=='POST':
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        tel = request.form.get("tel")
+        mail = request.form.get("mail")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        mention = request.form.get("mention")
+        profilphoto=request.files['profilphoto']
+        if nom :
+            db.execute("UPDATE utilisateur SET nom=? WHERE pseudo=?",nom,pseudo)
+        if prenom :
+            db.execute("UPDATE utilisateur SET prenom=? WHERE pseudo=?",prenom,pseudo)
+        if tel :
+            db.execute("UPDATE utilisateur SET tel=? WHERE pseudo=?",tel,pseudo)
+        if mail :
+            db.execute("UPDATE utilisateur SET mail=? WHERE pseudo=?",mail,pseudo)
+        if mention:
+            db.execute("UPDATE utilisateur SET mention=? WHERE pseudo=?",mention,pseudo)
+        if profilphoto and allowed_file(profilphoto.filename):
+            filename = secure_filename(profilphoto.filename)
+            profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            db.execute("UPDATE utilisateur SET profilphoto=? WHERE pseudo=?",filename,pseudo)
+        if not confirm_password and password : 
+            return render_template("modifier_profil.html", message='Veuillez confirmer votre mot de passe',profil=profil)
+        if not password and confirm_password: 
+            return render_template("modifier_profil.html", message='Veuillez confirmer votre mot de passe',profil=profil)
+        if (len(password) <8 or len(password) > 20) and password and confirm_password :
+            return render_template("modifier_profil.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', profil=profil)
+        if not mdpcorrect(password) and password and confirm_password :
+            return render_template("modifier_profil.html", message='Votre mot de passe contient un caractère non autorisé',profil=profil)
+        if password!=confirm_password :
+            return render_template("modifier_profil.html", message='Veuillez rentrer deux fois le même mot de passe',profil=profil)
+        if password and confirm_password:
+            password=crypte_mdp(password)
+            db.execute("UPDATE utilisateur SET password=? WHERE pseudo=?",password,pseudo)
+            # if not profilphoto in ALLOWED_EXTENSIONS:
+        #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+        new_pseudo=request.form.get("pseudo")
+        if new_pseudo:
+            utilisateur=db.execute("SELECT nom,prenom,tel,mail,password,mention,profilphoto FROM utilisateur WHERE pseudo=?",pseudo)
+            nom = utilisateur[0]['nom']
+            prenom = utilisateur[0]['prenom']
+            tel = utilisateur[0]['tel']
+            mail = utilisateur[0]['mail']
+            password = utilisateur[0]['password']
+            mention = utilisateur[0]['mention']
+            profilphoto = utilisateur[0]['profilphoto']
+            if profilphoto:    
+                try : 
+                    db.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", nom, prenom, new_pseudo, tel, mail, password, mention, profilphoto)   
+                    db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
+                    db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
+                except sqlite3.IntegrityError : 
+                    return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)         
+            else:
+                try : 
+                    db.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", nom, prenom, new_pseudo, tel, mail, password, mention)
+                    db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
+                    db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
+                except sqlite3.IntegrityError : 
+                    return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)    
+            session.clear()
+            session["name"]=new_pseudo    
+        if request.form.get("pseudo"):
+            return redirect('/profil/'+request.form.get("pseudo"))
+        return redirect('/profil/'+pseudo)
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
     if not session.get("name"):
         return redirect("/connexion")
     navbar='connectedLayout'
-    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
     maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
     noProp=newID(maxNoProp[0]["maxnoprop"])
     if request.method=='GET':
@@ -258,7 +349,7 @@ def proposition(noProp:int):
         return render_template("proposition.html", proposition=proposition,navbar=navbar)
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("proposition.html", proposition=proposition,navbar=navbar,profil=profil)
 
 @app.route('/recherche', methods=['GET','POST'])
@@ -269,7 +360,7 @@ def recherche():
             return render_template("recherche.html",message='',departements=DEPARTEMENTS,navbar=navbar)
         else:
             navbar='connectedLayout'
-            profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+            profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
             return render_template("recherche.html",message='',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
     if request.method=='POST':
         codePostal=request.form.get("Code Postal")
@@ -280,7 +371,7 @@ def recherche():
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar)
             else:
                 navbar='connectedLayout'
-                profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
         elif codePostal or departement:
             if codePostal:
@@ -290,7 +381,7 @@ def recherche():
                     return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions)
                 else:
                     navbar='connectedLayout'
-                    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
                     return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions)
             if departement:
                 key_dep = list(DEPARTEMENTS.keys())
@@ -302,7 +393,7 @@ def recherche():
                     return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions,dep=dep)
                 else:
                     navbar='connectedLayout'
-                    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
                     return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
 
 @app.route('/recherche/<string:region>')
@@ -350,7 +441,7 @@ def rechercheregion(region:str):
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions13)   
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         if region=="AuvergneRhôneAlpes":
             return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions1)
         if region=="HautsdeFrance":
@@ -383,7 +474,7 @@ def supprPropose(id:int):
     if not session.get("name"):
         redirect('/')
     else:
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         db.execute("DELETE FROM proposition WHERE noprop=?",id)
         return render_template('supprProp.html',profil=profil)
 
@@ -394,14 +485,15 @@ def todo():
         return render_template("TODO.html",navbar=navbar)
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("TODO.html",navbar=navbar,profil=profil)
 
 #pour verifier que le fichier selectionné est bien du bon format
 def allowed_file(filename):
-    namelist=filename.split('.')
-    if len(namelist)==2:
-        return(namelist[1] in ALLOWED_EXTENSIONS)
+    if type(filename)==str:
+        namelist=filename.split('.')
+        if len(namelist)==2:
+            return(namelist[1] in ALLOWED_EXTENSIONS)
     return(False)
 
 def crypte_mdp(mdp):
