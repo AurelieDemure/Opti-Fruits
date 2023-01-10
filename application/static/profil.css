@@ -3,21 +3,21 @@
     margin-left:15em;
     margin-right:15em;
     padding:2em;
-    background-color: white;
+    background-color:var(--light-pink);
     border-width: 3px;
     border-style: solid;
-    border-color :var(--dark-pink);
+    border-color :var(--dark-green);
     font-size:1.5em;
     display:flex;
     flex-direction:wrap;
 }
 
 .nom {
-    color:var(--dark-pink);
+    color:var(--dark-green);
 }
 
 .mention {
-    color:grey;
+    color:var(--dark-green);
     padding-top: 5em;
 }
 
