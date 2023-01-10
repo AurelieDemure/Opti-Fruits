@@ -57,3 +57,4 @@ def test_crypte_mdp():
         assert(len(crypte_mdp((randomstr)))==len(randomstr))
 
 print(crypte_mdp('LQacA90hWA'))
+print(crypte_mdp('opti_mireille12'))

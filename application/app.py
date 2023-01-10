@@ -132,11 +132,13 @@ def inscription():
             try : 
                 connection = sqlite3.connect('bd4.db')
                 connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
+                # connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", nom, prenom, pseudo, tel, mail, password, mention, filename)   
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         else : 
             connection = sqlite3.connect('bd4.db')
             connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', NULL)")
+            # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", nom, prenom, pseudo, tel, mail, password, mention)
         connection.commit()
         # return redirect('/profil/'+mail)
         connection.close()
