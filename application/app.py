@@ -56,15 +56,17 @@ def assos():
     print(request)
     if request.args.get('q') is not None:
         assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
+        ville=request.args.get("q")
     else:
         assos=db.execute("SELECT * FROM association ORDER BY ville")
+        ville=''
     if not session.get("name"):
         navbar='unconnectedLayout'
-        return render_template("Assos.html",assos=assos,navbar=navbar)
+        return render_template("Assos.html",assos=assos,navbar=navbar,ville=ville)
     else:
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil)
+        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil,ville=ville)
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
@@ -133,14 +135,14 @@ def inscription():
             connection = sqlite3.connect('bd4.db')
             try : 
                 connection = sqlite3.connect('bd4.db')
-                connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
-                # connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", nom, prenom, pseudo, tel, mail, password, mention, filename)   
+                # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
+                connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, pseudo, tel, mail, password, mention, filename))   
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         else : 
             connection = sqlite3.connect('bd4.db')
-            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', NULL)")
-            # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", nom, prenom, pseudo, tel, mail, password, mention)
+            # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', NULL)")
+            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
         connection.commit()
         # return redirect('/profil/'+mail)
         connection.close()
