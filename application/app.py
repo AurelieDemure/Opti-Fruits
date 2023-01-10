@@ -31,10 +31,12 @@ def newID(maxid):
     return(int(maxid)+1)
 
 def valideNameFrume(frume):
-    upperfrume=frume.upper()
-    if upperfrume[-1]=='S':
-        upperfrume=upperfrume[:-1]
-    return upperfrume
+    if type(frume)==str and frume!='':
+        upperfrume=frume.upper()
+        if upperfrume[-1]=='S':
+            upperfrume=upperfrume[:-1]
+        return upperfrume
+    return(frume)
 
 @app.route('/')
 def homeDev():
