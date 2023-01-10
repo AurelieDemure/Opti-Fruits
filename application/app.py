@@ -56,15 +56,17 @@ def assos():
     print(request)
     if request.args.get('q') is not None:
         assos=db.execute("SELECT * FROM association WHERE ville LIKE ? ORDER BY ville", "%" +request.args.get("q")+"%")
+        ville=request.args.get("q")
     else:
         assos=db.execute("SELECT * FROM association ORDER BY ville")
+        ville=''
     if not session.get("name"):
         navbar='unconnectedLayout'
-        return render_template("Assos.html",assos=assos,navbar=navbar)
+        return render_template("Assos.html",assos=assos,navbar=navbar,ville=ville)
     else:
         navbar='connectedLayout'
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
-        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil)
+        return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil,ville=ville)
 
 @app.route('/connexion',methods=['GET','POST'])
 def connexion():
@@ -161,7 +163,10 @@ def messagerie(pseudo:str):
         profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
         recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
         if pseudo=='None':
-            return redirect('/messagerie/'+recipients[0]['pseudo'])
+            if recipients==[]:
+                return render_template("messagerie.html", pseudo=pseudo,recipients=recipients,navbar=navbar,profil=profil)
+            else:
+                return redirect('/messagerie/'+recipients[0]['pseudo'])
         pseudoRecipient=[]
         for recipient in recipients:
             pseudoRecipient.append(recipient["pseudo"])
