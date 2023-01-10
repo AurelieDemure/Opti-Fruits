@@ -84,7 +84,7 @@ def connexion():
             return render_template("connexion.html", message="Veuillez renseigner votre mot de passe", mail=mail)
         password=db.execute("SELECT password FROM utilisateur WHERE password=?",password)
         password2=db.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
-        if password2 == password:
+        if password2 == password and password!=[]:
             pseudo=db.execute("SELECT pseudo FROM utilisateur WHERE mail=?",mail)
             pseudo=pseudo[0]['pseudo']
             session["name"]=pseudo
@@ -121,7 +121,7 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not password :
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
-        if len(password) <=8 or len(password) >= 20 :
+        if len(password) <8 or len(password) > 20 :
             return render_template("inscription.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not mdpcorrect(password) :
             return render_template("inscription.html", message='Votre mot de passe contient un caractère non autorisé', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
@@ -129,8 +129,6 @@ def inscription():
             return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
             return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
-        # if not profilphoto in ALLOWED_EXTENSIONS:
-        #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         password=crypte_mdp(password)
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
@@ -138,22 +136,34 @@ def inscription():
             connection = sqlite3.connect('bd4.db')
             try : 
                 connection = sqlite3.connect('bd4.db')
-                # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
                 connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, pseudo, tel, mail, password, mention, filename))   
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         else : 
+<<<<<<< HEAD
+            try:
+                connection = sqlite3.connect('bd4.db')
+                connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
+            except sqlite3.IntegrityError : 
+                return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+=======
             connection = sqlite3.connect('bd4.db')
-            # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', NULL)")
             connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
+>>>>>>> 9ffe2b7dc13327b9c64e786bf0804884e081f9d2
         connection.commit()
-        # return redirect('/profil/'+mail)
         connection.close()
         session["name"]=pseudo
         return redirect('/profil/'+pseudo)
 
 @app.route('/logout')
 def logout():
+    session['name']=None
+    return redirect('/')
+
+@app.route('/delete')
+def delete():
+    db.execute("DELETE FROM proposition WHERE pseudo=?",session.get("name"))
+    db.execute("DELETE FROM utilisateur WHERE pseudo=?",session.get("name"))
     session['name']=None
     return redirect('/')
 
@@ -201,6 +211,81 @@ def profil(pseudo:str):
         return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar,profil=profil)
     navbar='unconnectedLayout'
     return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar)
+
+@app.route('/modifierprofil/<string:pseudo>',methods=['GET','POST'])
+def modifier_profil(pseudo:str):
+    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
+    if pseudo!=profil[0]['pseudo']:
+        return redirect('/home')
+    if request.method=='GET':
+        return render_template("modifier_profil.html",profil=profil)
+    if request.method=='POST':
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        tel = request.form.get("tel")
+        mail = request.form.get("mail")
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        mention = request.form.get("mention")
+        profilphoto=request.files['profilphoto']
+        if nom :
+            db.execute("UPDATE utilisateur SET nom=? WHERE pseudo=?",nom,pseudo)
+        if prenom :
+            db.execute("UPDATE utilisateur SET prenom=? WHERE pseudo=?",prenom,pseudo)
+        if tel :
+            db.execute("UPDATE utilisateur SET tel=? WHERE pseudo=?",tel,pseudo)
+        if mail :
+            db.execute("UPDATE utilisateur SET mail=? WHERE pseudo=?",mail,pseudo)
+        if mention:
+            db.execute("UPDATE utilisateur SET mention=? WHERE pseudo=?",mention,pseudo)
+        if profilphoto and allowed_file(profilphoto.filename):
+            filename = secure_filename(profilphoto.filename)
+            profilphoto.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            db.execute("UPDATE utilisateur SET profilphoto=? WHERE pseudo=?",filename,pseudo)
+        if not confirm_password and password : 
+            return render_template("modifier_profil.html", message='Veuillez confirmer votre mot de passe',profil=profil)
+        if not password and confirm_password: 
+            return render_template("modifier_profil.html", message='Veuillez confirmer votre mot de passe',profil=profil)
+        if (len(password) <8 or len(password) > 20) and password and confirm_password :
+            return render_template("modifier_profil.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', profil=profil)
+        if not mdpcorrect(password) and password and confirm_password :
+            return render_template("modifier_profil.html", message='Votre mot de passe contient un caractère non autorisé',profil=profil)
+        if password!=confirm_password :
+            return render_template("modifier_profil.html", message='Veuillez rentrer deux fois le même mot de passe',profil=profil)
+        if password and confirm_password:
+            password=crypte_mdp(password)
+            db.execute("UPDATE utilisateur SET password=? WHERE pseudo=?",password,pseudo)
+            # if not profilphoto in ALLOWED_EXTENSIONS:
+        #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+        new_pseudo=request.form.get("pseudo")
+        if new_pseudo:
+            utilisateur=db.execute("SELECT nom,prenom,tel,mail,password,mention,profilphoto FROM utilisateur WHERE pseudo=?",pseudo)
+            nom = utilisateur[0]['nom']
+            prenom = utilisateur[0]['prenom']
+            tel = utilisateur[0]['tel']
+            mail = utilisateur[0]['mail']
+            password = utilisateur[0]['password']
+            mention = utilisateur[0]['mention']
+            profilphoto = utilisateur[0]['profilphoto']
+            if profilphoto:    
+                try : 
+                    db.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", nom, prenom, new_pseudo, tel, mail, password, mention, profilphoto)   
+                    db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
+                    db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
+                except sqlite3.IntegrityError : 
+                    return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)         
+            else:
+                try : 
+                    db.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", nom, prenom, new_pseudo, tel, mail, password, mention)
+                    db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
+                    db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
+                except sqlite3.IntegrityError : 
+                    return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)    
+            session.clear()
+            session["name"]=new_pseudo    
+        if request.form.get("pseudo"):
+            return redirect('/profil/'+request.form.get("pseudo"))
+        return redirect('/profil/'+pseudo)
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
