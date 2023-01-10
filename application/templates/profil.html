@@ -15,22 +15,7 @@
     </div>
 
 
-{%if profil and user.pseudo==profil[0]["pseudo"]%}
-<div class="deco">
-    <a class="buttonpink deco" href="/logout">Se déconnecter</a>
-</div>
-<div class="modifier">
-    <a class="buttongreen deco" href="/modifierprofil/{{profil[0]["pseudo"]}}">Modifier mes informations</a>
-</div>
-<div class="supprimer">
-    <a class="buttongreen deco" href="/delete">Supprimer mon compte</a>
-</div>
-{%else%}
-<div class="messagerie">
-    <a class="buttongreen deco" href="/messagerie/{{user.pseudo}}">Envoyer un message à {{user.pseudo}}</a>
-</div>
-{%endif%}
-{%endfor%}
+
 
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
     <div class="divrow space fluxdiv">
@@ -50,6 +35,18 @@
         </div>
     </div>
 
+{%if profil and user.pseudo==profil[0]["pseudo"]%}
+<div class="deco">
+    <a class="buttonpink deco" href="/logout">Se déconnecter</a>
+    <a class="buttongreen deco" href="/modifierprofil/{{profil[0]["pseudo"]}}">Modifier mes informations</a>
+    <a class="buttongreen deco" href="/delete">Supprimer mon compte</a>
+</div>
+{%else%}
+<div class="messagerie">
+    <a class="buttongreen deco" href="/messagerie/{{user.pseudo}}">Envoyer un message à {{user.pseudo}}</a>
+</div>
+{%endif%}
+{%endfor%}
 
 
 {%endblock%}

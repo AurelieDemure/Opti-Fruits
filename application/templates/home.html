@@ -2,8 +2,9 @@
 
 {%block body%}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
-    <div class="divrow space">
-        <div class="fluxdiv space fluxdiv scroll">
+    <div class="message">{{message}}</div>
+    <div class="divrow space fluxdiv">
+        <div class="fluxdiv space divcolumn space">
             {%if propositions==[]%}
                 <div class="text textprop">
                     Pas de proposition actuellement disponible :/

@@ -92,7 +92,6 @@ def connexion():
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
 
-
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
     if session.get("name"):
@@ -119,6 +118,11 @@ def inscription():
             return render_template("inscription.html", message='Veuillez renseigner votre numéro de téléphone', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not mail :
             return render_template("inscription.html", message='Veuillez renseigner votre adresse mail', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
+        mail_list=db.execute("SELECT mail from utilisateur")
+        for k in range(len(mail_list)):
+            var= mail_list[k]['mail']
+            if var == mail:
+                return render_template("inscription.html", message='Cette adresse mail est déjà associée à un compte', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if not password :
             return render_template("inscription.html", message='Veuillez renseigner votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password ,mention=mention, profilphoto=profilphoto)
         if len(password) <8 or len(password) > 20 :
@@ -230,6 +234,11 @@ def modifier_profil(pseudo:str):
         if tel :
             db.execute("UPDATE utilisateur SET tel=? WHERE pseudo=?",tel,pseudo)
         if mail :
+            mail_list=db.execute("SELECT mail from utilisateur")
+            for k in range(len(mail_list)):
+                var= mail_list[k]['mail']
+                if var == mail:
+                    return render_template("modifier_profil.html", message='Cette adresse mail est déjà associée à un compte', profil=profil)
             db.execute("UPDATE utilisateur SET mail=? WHERE pseudo=?",mail,pseudo)
         if mention:
             db.execute("UPDATE utilisateur SET mention=? WHERE pseudo=?",mention,pseudo)
@@ -264,15 +273,21 @@ def modifier_profil(pseudo:str):
             profilphoto = utilisateur[0]['profilphoto']
             if profilphoto:    
                 try : 
-                    db.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", nom, prenom, new_pseudo, tel, mail, password, mention, profilphoto)   
+                    connection = sqlite3.connect('bd4.db')
+                    connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, new_pseudo, tel, mail, password, mention, profilphoto))   
                     db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
+                    db.execute("UPDATE messagerie SET pseudo_sender=? WHERE pseudo_sender=?",new_pseudo,pseudo)
+                    db.execute("UPDATE messagerie SET pseudo_recipient=? WHERE pseudo_recipient=?",new_pseudo,pseudo)
                     db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
                 except sqlite3.IntegrityError : 
                     return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)         
             else:
                 try : 
-                    db.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", nom, prenom, new_pseudo, tel, mail, password, mention)
+                    connection = sqlite3.connect('bd4.db')
+                    connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, new_pseudo, tel, mail, password, mention))
                     db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
+                    db.execute("UPDATE messagerie SET pseudo_sender=? WHERE pseudo_sender=?",new_pseudo,pseudo)
+                    db.execute("UPDATE messagerie SET pseudo_recipient=? WHERE pseudo_recipient=?",new_pseudo,pseudo)
                     db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
                 except sqlite3.IntegrityError : 
                     return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)    
