@@ -7,7 +7,7 @@
     <div class="divprop divcolumn propose centre">
         <div class="divprop divrow space centre">
             <div class="divprop divcolumn centre">
-                {%if proposition[0]["pseudo"]!=profil[0]["pseudo"]%}
+                {%if profil and proposition[0]["pseudo"]!=profil[0]["pseudo"]%}
                 <a class="lien" href="/messagerie/{{proposition[0]["pseudo"]}}">
                 {%endif%}
                 <div class="divcolumn">
