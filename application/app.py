@@ -162,10 +162,8 @@ def logout():
 @app.route('/delete')
 def delete():
     db.execute("DELETE FROM proposition WHERE pseudo=?",session.get("name"))
-    db.execute("DELETE FROM messagerie WHERE pseudo_sender=?",session.get("name"))
-    db.execute("DELETE FROM messagerie WHERE pseudo_recipient=?",session.get("name"))
     db.execute("DELETE FROM utilisateur WHERE pseudo=?",session.get("name"))
-    session['name']=None
+    session['name']=None 
     return redirect('/')
 
 @app.route("/messagerie/<string:pseudo>",methods=['GET','POST'])
@@ -276,23 +274,25 @@ def modifier_profil(pseudo:str):
             if profilphoto:    
                 try : 
                     connection = sqlite3.connect('bd4.db')
-                    connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, new_pseudo, tel, mail, password, mention, profilphoto))   
-                    db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
-                    db.execute("UPDATE messagerie SET pseudo_sender=? WHERE pseudo_sender=?",new_pseudo,pseudo)
-                    db.execute("UPDATE messagerie SET pseudo_recipient=? WHERE pseudo_recipient=?",new_pseudo,pseudo)
-                    db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
+                    connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, new_pseudo, tel, mail, password, mention, profilphoto))
+                    connection.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",(new_pseudo,pseudo))
+                    connection.execute("UPDATE messagerie SET pseudo_sender=? WHERE pseudo_sender=?",(new_pseudo,pseudo))
+                    connection.execute("UPDATE messagerie SET pseudo_recipient=? WHERE pseudo_recipient=?",(new_pseudo,pseudo))
+                    connection.execute("DELETE FROM utilisateur WHERE pseudo=?",(pseudo,))
                 except sqlite3.IntegrityError : 
                     return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)         
             else:
                 try : 
                     connection = sqlite3.connect('bd4.db')
                     connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, new_pseudo, tel, mail, password, mention))
-                    db.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",new_pseudo,pseudo)
-                    db.execute("UPDATE messagerie SET pseudo_sender=? WHERE pseudo_sender=?",new_pseudo,pseudo)
-                    db.execute("UPDATE messagerie SET pseudo_recipient=? WHERE pseudo_recipient=?",new_pseudo,pseudo)
-                    db.execute("DELETE FROM utilisateur WHERE pseudo=?",pseudo)
+                    connection.execute("UPDATE proposition SET pseudo=? WHERE pseudo=?",(new_pseudo,pseudo))
+                    connection.execute("UPDATE messagerie SET pseudo_sender=? WHERE pseudo_sender=?",(new_pseudo,pseudo))
+                    connection.execute("UPDATE messagerie SET pseudo_recipient=? WHERE pseudo_recipient=?",(new_pseudo,pseudo))
+                    connection.execute("DELETE FROM utilisateur WHERE pseudo=?",(pseudo,))
                 except sqlite3.IntegrityError : 
                     return render_template("modifier_profil.html", message='Ce pseudo est déjà pris',profil=profil)    
+            connection.commit()
+            connection.close()
             session.clear()
             session["name"]=new_pseudo    
         if request.form.get("pseudo"):
