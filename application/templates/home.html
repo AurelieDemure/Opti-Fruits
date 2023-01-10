@@ -2,14 +2,8 @@
 
 {%block body%}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
-<<<<<<< HEAD
-    <div class="message">{{message}}</div>
     <div class="divrow space fluxdiv">
         <div class="fluxdiv space divcolumn space">
-=======
-    <div class="divrow space">
-        <div class="fluxdiv space fluxdiv scroll">
->>>>>>> c18cdbcbbd456eb8b9e6b90e1a943230f9cd6d29
             {%if propositions==[]%}
                 <div class="text textprop">
                     Pas de proposition actuellement disponible :/
@@ -33,7 +27,7 @@
                 {%endfor%}
             {%endif%}
         </div>
-        <div class="divcolumn space">
+        <div class="divcolumn">
             <a class="text" href="/recherche">
                 <img class="map" src="{{ url_for('static', filename='images/carte_region_scrop.jpg')}}">
             </a>
