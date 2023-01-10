@@ -140,16 +140,11 @@ def inscription():
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         else : 
-<<<<<<< HEAD
             try:
                 connection = sqlite3.connect('bd4.db')
                 connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
-=======
-            connection = sqlite3.connect('bd4.db')
-            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
->>>>>>> 9ffe2b7dc13327b9c64e786bf0804884e081f9d2
         connection.commit()
         connection.close()
         session["name"]=pseudo
