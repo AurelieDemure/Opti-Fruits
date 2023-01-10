@@ -38,14 +38,6 @@
                         </div>
                     </div>
                     <div class="divprop divcolumn">
-                        <div class="divprop divcolumn">
-                            <div class="divprop">Date de la cueillette:</div>
-                            <input class="inputcolor" name="dateCueillette" placeholder="ex : 12/06/2022" value={{dateCueillette}}>
-                        </div>
-                        <div class="divprop divcolumn">
-                            <div class="divprop">Date d'expiration de la demande (*):</div>
-                            <input class="inputcolor" name="dateFin" placeholder="ex : 14/06/2022" value={{dateFin}}>
-                        </div>
                         <div class="divprop divrow flex">
                             {%if not cueillette%}
                                 <input type="checkbox" id="cueillette" name="cueillette" value="Oui">
@@ -55,6 +47,15 @@
                             <div class="divprop">Si les produits ne sont pas cueillis, 
                                 je propose aux personnes de venir les cueillir</div>
                         </div>
+                        <div class="divprop divcolumn">
+                            <div class="divprop">Date de la cueillette (si les fruits sont déjà cueillis):</div>
+                            <input class="inputcolor" name="dateCueillette" placeholder="ex : 12/06/2022" value={{dateCueillette}}>
+                        </div>
+                        <div class="divprop divcolumn">
+                            <div class="divprop">Date d'expiration de la demande (*):</div>
+                            <input class="inputcolor" name="dateFin" placeholder="ex : 14/06/2022" value={{dateFin}}>
+                        </div>
+                        
                         <div class="divprop divcolumn">
                             <div class="divprop">Photo (png, jpg ou jpeg) (*):</div>
                             <input type="file" name="photo" accept="image/x-png,image/jpg,image/jpeg" value={{photo}}>                 
