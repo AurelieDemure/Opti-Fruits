@@ -19,15 +19,26 @@
 <div class="deco">
     <a class="buttonpink deco" href="/logout">Se déconnecter</a>
 </div>
+<div class="modifier">
+    <a class="buttongreen deco" href="/modifierprofil/{{profil[0]["pseudo"]}}">Modifier mes informations</a>
+</div>
+<div class="supprimer">
+    <a class="buttongreen deco" href="/delete">Supprimer mon compte</a>
+</div>
+{%else%}
+<div class="messagerie">
+    <a class="buttongreen deco" href="/messagerie/{{user.pseudo}}">Envoyer un message à {{user.pseudo}}</a>
+</div>
 {%endif%}
 {%endfor%}
+
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css')}}">
     <div class="divrow space fluxdiv">
         <div class="fluxdiv space divcolumn space">
                 {%for proposition in propositions%}
                     <a class="proposition" href="/proposition/{{proposition.noprop}}">
                         <div class="propose divrow space">
-                            <div class="divcolumn">
+                            <div class="divcolumn">²
                                 <img class="propimg" src="{{ url_for('static', filename=photo_profil)}}">
                                 <p class="text space pseudo">{{proposition.pseudo}}</p>
                             </div>
