@@ -43,7 +43,7 @@ def homeDev():
     propositions=db.execute("SELECT p.*,u.profilphoto FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo")
     if session.get("name"):
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         if profil!=[]:
             return render_template('home.html',navbar=navbar,profil=profil,propositions=propositions)
         else:
@@ -85,10 +85,13 @@ def connexion():
         password=db.execute("SELECT password FROM utilisateur WHERE password=?",password)
         password2=db.execute("SELECT password FROM utilisateur WHERE mail=?",mail)
         if password2 == password:
-            session["name"]=mail
-            return redirect('/profil/'+mail)
+            pseudo=db.execute("SELECT pseudo FROM utilisateur WHERE mail=?",mail)
+            pseudo=pseudo[0]['pseudo']
+            session["name"]=pseudo
+            return redirect('/profil/'+pseudo)
         else:
             return render_template("connexion.html", message="Adresse mail ou mot de passe incorrect")
+
 
 @app.route('/inscription', methods=['GET','POST'])
 def inscription():
@@ -146,8 +149,8 @@ def inscription():
         connection.commit()
         # return redirect('/profil/'+mail)
         connection.close()
-        session["name"]=mail
-        return redirect('/profil/'+mail)
+        session["name"]=pseudo
+        return redirect('/profil/'+pseudo)
 
 @app.route('/logout')
 def logout():
@@ -160,7 +163,7 @@ def messagerie(pseudo:str):
             return redirect('/')
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         recipients=db.execute("SELECT u.pseudo, u.profilphoto, max(m.id) AS lastId FROM utilisateur AS u JOIN messagerie AS m ON u.pseudo=m.pseudo_sender OR u.pseudo=m.pseudo_recipient WHERE (m.pseudo_sender=? or m.pseudo_recipient=?) AND u.pseudo NOT LIKE ? GROUP BY u.pseudo ORDER BY lastId DESC",profil[0]['pseudo'],profil[0]['pseudo'],profil[0]['pseudo'])
         if pseudo=='None':
             return redirect('/messagerie/'+recipients[0]['pseudo'])
@@ -179,11 +182,11 @@ def messagerie(pseudo:str):
         picture=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)[0]['profilphoto']
         return render_template("messagerie.html", pseudo=pseudo,picture=picture,recipients=recipients,messages=messages,navbar=navbar,profil=profil)
 
-@app.route('/profil/<string:mail>')
-def profil(mail:str):
-    utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE mail=?",mail)
-    propositions=db.execute("SELECT * FROM proposition AS p JOIN utilisateur AS u ON p.pseudo=u.pseudo WHERE u.mail=?",mail)            
-    photo_profil=db.execute("SELECT profilphoto FROM utilisateur WHERE mail=?",mail)
+@app.route('/profil/<string:pseudo>')
+def profil(pseudo:str):
+    utilisateur=db.execute("SELECT nom,prenom,pseudo,mail,mention FROM utilisateur WHERE pseudo=?",pseudo)
+    propositions=db.execute("SELECT * FROM proposition WHERE pseudo=?",pseudo)            
+    photo_profil=db.execute("SELECT profilphoto FROM utilisateur WHERE pseudo=?",pseudo)
     if photo_profil==[{'profilphoto': None}]:
         photo_profil='images/Default.png'
     else:
@@ -191,7 +194,7 @@ def profil(mail:str):
             photo_profil='downloadPictures/'+str(photoprofil['profilphoto'])
     if session.get("name"):
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar,profil=profil)
     navbar='unconnectedLayout'
     return render_template("profil.html",utilisateur=utilisateur,photo_profil=photo_profil,propositions=propositions,navbar=navbar)
@@ -201,7 +204,7 @@ def propose():
     if not session.get("name"):
         return redirect("/connexion")
     navbar='connectedLayout'
-    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
     maxNoProp=db.execute("SELECT max(noprop) as maxnoprop FROM proposition")
     noProp=newID(maxNoProp[0]["maxnoprop"])
     if request.method=='GET':
@@ -258,7 +261,7 @@ def proposition(noProp:int):
         return render_template("proposition.html", proposition=proposition,navbar=navbar)
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("proposition.html", proposition=proposition,navbar=navbar,profil=profil)
 
 @app.route('/recherche', methods=['GET','POST'])
@@ -269,7 +272,7 @@ def recherche():
             return render_template("recherche.html",message='',departements=DEPARTEMENTS,navbar=navbar)
         else:
             navbar='connectedLayout'
-            profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+            profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
             return render_template("recherche.html",message='',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
     if request.method=='POST':
         codePostal=request.form.get("Code Postal")
@@ -280,7 +283,7 @@ def recherche():
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar)
             else:
                 navbar='connectedLayout'
-                profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
                 return render_template("recherche.html",message='Veuillez saisir un code postal ou choisir un département',departements=DEPARTEMENTS,navbar=navbar,profil=profil)
         elif codePostal or departement:
             if codePostal:
@@ -290,7 +293,7 @@ def recherche():
                     return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions)
                 else:
                     navbar='connectedLayout'
-                    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
                     return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions)
             if departement:
                 key_dep = list(DEPARTEMENTS.keys())
@@ -302,7 +305,7 @@ def recherche():
                     return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions,dep=dep)
                 else:
                     navbar='connectedLayout'
-                    profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+                    profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
                     return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions,dep=dep)
 
 @app.route('/recherche/<string:region>')
@@ -350,7 +353,7 @@ def rechercheregion(region:str):
             return render_template("rechercheResultats.html",navbar=navbar,propositions=propositions13)   
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         if region=="AuvergneRhôneAlpes":
             return render_template("rechercheResultats.html",navbar=navbar,profil=profil,propositions=propositions1)
         if region=="HautsdeFrance":
@@ -383,7 +386,7 @@ def supprPropose(id:int):
     if not session.get("name"):
         redirect('/')
     else:
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         db.execute("DELETE FROM proposition WHERE noprop=?",id)
         return render_template('supprProp.html',profil=profil)
 
@@ -394,7 +397,7 @@ def todo():
         return render_template("TODO.html",navbar=navbar)
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("TODO.html",navbar=navbar,profil=profil)
 
 #pour verifier que le fichier selectionné est bien du bon format
