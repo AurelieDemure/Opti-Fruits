@@ -1,8 +1,9 @@
 .fluxdiv{
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     margin: 25px;
+    height:500px;
+    width: 750px;
 }
 
 .img{

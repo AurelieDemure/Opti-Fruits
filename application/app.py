@@ -489,9 +489,10 @@ def todo():
 
 #pour verifier que le fichier selectionné est bien du bon format
 def allowed_file(filename):
-    namelist=filename.split('.')
-    if len(namelist)==2:
-        return(namelist[1] in ALLOWED_EXTENSIONS)
+    if type(filename)==str:
+        namelist=filename.split('.')
+        if len(namelist)==2:
+            return(namelist[1] in ALLOWED_EXTENSIONS)
     return(False)
 
 def crypte_mdp(mdp):
