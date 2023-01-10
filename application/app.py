@@ -158,6 +158,8 @@ def logout():
 @app.route('/delete')
 def delete():
     db.execute("DELETE FROM proposition WHERE pseudo=?",session.get("name"))
+    db.execute("DELETE FROM messagerie WHERE pseudo_sender=?",session.get("name"))
+    db.execute("DELETE FROM messagerie WHERE pseudo_recipient=?",session.get("name"))
     db.execute("DELETE FROM utilisateur WHERE pseudo=?",session.get("name"))
     session['name']=None
     return redirect('/')
