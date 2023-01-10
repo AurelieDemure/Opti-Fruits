@@ -62,7 +62,7 @@ body {
     font-size: 25px;
     margin:0px;
 }
-nav { 
+nav {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -85,4 +85,9 @@ nav {
 
 .lien {
     text-decoration:none;
+}
+
+.scroll{
+    overflow-x: hidden;
+    overflow-y: auto;
 }
