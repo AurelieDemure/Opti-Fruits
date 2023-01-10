@@ -129,8 +129,6 @@ def inscription():
             return render_template("inscription.html", message='Veuillez confirmer votre mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         if password!=confirm_password :
             return render_template("inscription.html", message='Veuillez rentrer deux fois le même mot de passe', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
-        # if not profilphoto in ALLOWED_EXTENSIONS:
-        #    return render_template("inscription.html", message='La photo doit être au format png, jpg, ou jpeg', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         password=crypte_mdp(password)
         if profilphoto and allowed_file(profilphoto.filename):
             filename = secure_filename(profilphoto.filename)
@@ -138,18 +136,21 @@ def inscription():
             connection = sqlite3.connect('bd4.db')
             try : 
                 connection = sqlite3.connect('bd4.db')
-                # connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES('" +nom+ "', '" +prenom+"', '" +pseudo+"', '" +tel+"', '" +mail+"', '" +password+"', '" +mention+"', '" +filename+"')")   
                 connection.execute("INSERT INTO utilisateur (nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,?)", (nom, prenom, pseudo, tel, mail, password, mention, filename))   
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
         else : 
+<<<<<<< HEAD
             try:
                 connection = sqlite3.connect('bd4.db')
                 connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
             except sqlite3.IntegrityError : 
                 return render_template("inscription.html", message='Ce pseudo est déjà pris', nom=nom, prenom=prenom, pseudo=pseudo, tel=tel, mail=mail, password=password, confirm_password=confirm_password, mention=mention, profilphoto=profilphoto)
+=======
+            connection = sqlite3.connect('bd4.db')
+            connection.execute("INSERT INTO utilisateur(nom,prenom,pseudo,tel,mail,password,mention,profilphoto) VALUES(?,?,?,?,?,?,?,NULL)", (nom, prenom, pseudo, tel, mail, password, mention))
+>>>>>>> 9ffe2b7dc13327b9c64e786bf0804884e081f9d2
         connection.commit()
-        # return redirect('/profil/'+mail)
         connection.close()
         session["name"]=pseudo
         return redirect('/profil/'+pseudo)
