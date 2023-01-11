@@ -18,7 +18,7 @@ def randdiffStr(n,longueur):
 
 
 def timer(fonction):
-    n=[1,10,100,200,300,400,500,600,700,800,900,1000]
+    n=[k for k in range (1,1000,50)]
     t=[]
     for i in range(len(n)):
         rand=randStr(N=(n[i]))
@@ -29,7 +29,6 @@ def timer(fonction):
     plt.plot(n,t)
     plt.xlabel('longueur de la chaîne')
     plt.ylabel('temps en s')
-    plt.title('Graphique', fontsize=45)
     plt.show()   
 
 def crypte_mdp(mdp):
@@ -51,6 +50,8 @@ def crypte_mdp(mdp):
             ind_ascii+=1
         return aux(mdplist[1:],ind_list+1)
     return aux (mdplist,0)
+
+print(timer(crypte_mdp))
 
 def test1_crypte_mdp():
     rand=[randStr(N=k) for k in [1,10,100,120,200,300,400,500,600,700,800,900,1000]]
