@@ -65,7 +65,7 @@ def assos():
         return render_template("Assos.html",assos=assos,navbar=navbar,ville=ville)
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil,ville=ville)
 
 @app.route('/connexion',methods=['GET','POST'])
