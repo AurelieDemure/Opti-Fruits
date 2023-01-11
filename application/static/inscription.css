@@ -47,6 +47,10 @@
         background-color: white;
     }
 
+    .mess {
+        text-align: center;
+    }
+
     .erreur {
         color: red
     }

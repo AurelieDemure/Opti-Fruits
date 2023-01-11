@@ -65,7 +65,7 @@ def assos():
         return render_template("Assos.html",assos=assos,navbar=navbar,ville=ville)
     else:
         navbar='connectedLayout'
-        profil=db.execute("SELECT * FROM utilisateur WHERE mail=?",session.get("name"))
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
         return render_template("Assos.html",assos=assos,navbar=navbar,profil=profil,ville=ville)
 
 @app.route('/connexion',methods=['GET','POST'])
@@ -159,12 +159,24 @@ def logout():
     session['name']=None
     return redirect('/')
 
+@app.route('/confirmer')
+def confirmer():
+    if not session.get("name"):
+            return redirect('/')
+    else:
+        navbar='connectedLayout'
+        profil=db.execute("SELECT * FROM utilisateur WHERE pseudo=?",session.get("name"))
+        return render_template("confirmer.html",profil=profil,navbar=navbar)
+
 @app.route('/delete')
 def delete():
-    db.execute("DELETE FROM proposition WHERE pseudo=?",session.get("name"))
-    db.execute("DELETE FROM utilisateur WHERE pseudo=?",session.get("name"))
-    session['name']=None 
-    return redirect('/')
+    if not session.get("name"):
+            return redirect('/')
+    else:
+        db.execute("DELETE FROM proposition WHERE pseudo=?",session.get("name"))
+        db.execute("DELETE FROM utilisateur WHERE pseudo=?",session.get("name"))
+        session['name']=None 
+        return redirect('/')
 
 @app.route("/messagerie/<string:pseudo>",methods=['GET','POST'])
 def messagerie(pseudo:str):
@@ -251,11 +263,7 @@ def modifier_profil(pseudo:str):
         if not password and confirm_password: 
             return render_template("modifier_profil.html", message='Veuillez confirmer votre mot de passe',profil=profil)
         if (len(password) <8 or len(password) > 20) and password and confirm_password :
-            return render_template("modifier_profil.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères', profil=profil)
-        if not mdpcorrect(password) and password and confirm_password :
-            return render_template("modifier_profil.html", message='Votre mot de passe contient un caractère non autorisé',profil=profil)
-        if password!=confirm_password :
-            return render_template("modifier_profil.html", message='Veuillez rentrer deux fois le même mot de passe',profil=profil)
+            return render_template("modifier_profil.html", message='La longueur de votre mot de passe doit être comprise entre 8 et 20 caractères',profil=profil)
         if password and confirm_password:
             password=crypte_mdp(password)
             db.execute("UPDATE utilisateur SET password=? WHERE pseudo=?",password,pseudo)
@@ -298,6 +306,7 @@ def modifier_profil(pseudo:str):
         if request.form.get("pseudo"):
             return redirect('/profil/'+request.form.get("pseudo"))
         return redirect('/profil/'+pseudo)
+
 
 @app.route('/propose',methods=['GET','POST'])
 def propose():
