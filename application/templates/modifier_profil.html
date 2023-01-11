@@ -4,32 +4,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href={{url_for('static', filename="inscription.css")}}> 
     <form action="/modifierprofil/{{profil[0]['pseudo']}}" method="POST" enctype=multipart/form-data>
+        <p class="mess">Veuillez remplir les champs correspondant aux informations que vous souhaitez modifier </p>
     <div class="page">
             <div class="Identité">
                 <div class="Text">Nom :</div>
-                <input class="input" name="nom" placeholder="ex : Desmoulins" value={{nom}}>
+                <input class="input" name="nom" placeholder={{profil[0]['nom']}} >
                 <div class="Text">Prénom :</div>
-                <input class="input" name="prenom" placeholder="ex : Mireille" value={{prenom}}>
+                <input class="input" name="prenom" placeholder={{profil[0]['prenom']}} >
                 <div class="Text">Pseudo :</div>
-                <input class="input" name="pseudo" placeholder="ex : Reine de la tarte aux pommes" value={{pseudo}}>
+                <input class="input" name="pseudo"  >
             </div>
             <div class="Contact">
                 <div class="Text">Téléphone :</div>
-                <input class="input" name="tel" placeholder="ex : 06 00 00 00 00" value={{tel}}>
+                <input class="input" name="tel" placeholder={{profil[0]['tel']}} >
                 <div class="Text">Adresse mail :</div>
-                <input class="input" name="mail" placeholder="ex : m.desmoulins@gmail.com" value={{mail}}>        
+                <input class="input" name="mail" placeholder={{profil[0]['mail']}} >        
             </div>
             <div class="Autres">
                 <div class="Text">Mot de passe :</div>
-                <input class="input" name="password" type="password" placeholder="ex : opti_mireille12 " value={{password}}>
+                <input class="input" name="password" type="password"  >
                 <div class="Text">Confirmation du mot de passe :</div>
-                <input class="input" name="confirm_password" type="password" placeholder="ex : opti_mireille12" value={{confirm_password}}>
+                <input class="input" name="confirm_password" type="password"  >
                 <div class="Text">Mentions :</div>
-                <input class="input" name="mention" placeholder="ex : horaires de disponibilité, passions..." value={{mention}}>
+                <input class="input" name="mention" >
                 <p>
                    <!-- <input type="checkbox" class="choix photo" name="choix photo" value="profilphoto"> -->
                     <div class="Text">Photo de profil : </div>
-                    <input class="input" name="profilphoto" type="file" value={{profilphoto}} accept="image/x-png,image/jpg,image/jpeg">
+                    <input class="input" name="profilphoto" type="file" accept="image/x-png,image/jpg,image/jpeg" >
                     <!-- <input type="checkbox" class="choix photo" name="choix photo" value="defaultphoto">
                     <div class="Text">Photo par défault :</div>
                     <img class="defaultphoto" name="defaultphoto" src={{url_for('static', filename="Profil1.png")}}> -->
